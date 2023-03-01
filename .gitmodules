@@ -22,3 +22,6 @@
 [submodule "spaethtech/synchronization"]
 	path = lib/synchronization
 	url = https://github.com/spaethtech/synchronization
+[submodule "spaethtech/rest"]
+	path = lib/rest
+	url = https://github.com/spaethtech/rest
