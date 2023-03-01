@@ -1,6 +1,6 @@
 {
     "name": "spaethtech/php-monorepo",
-    "description": "The monorepo for all of our PHP libraries",
+    "description": "The mono repo for all of our PHP libraries.",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
