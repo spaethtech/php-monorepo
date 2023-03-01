@@ -31,3 +31,6 @@
 [submodule "spaethtech/slim"]
 	path = lib/slim
 	url = https://github.com/spaethtech/slim
+[submodule "spaethtech/twig"]
+	path = lib/twig
+	url = https://github.com/spaethtech/twig
