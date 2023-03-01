@@ -1,9 +1,6 @@
 [submodule "spaethtech/robo"]
 	path = lib/robo
 	url = https://github.com/spaethtech/robo
-[submodule "spaethtech/annotations"]
-	path = lib/annotations
-	url = https://github.com/spaethtech/annotations
 [submodule "spaethtech/collections"]
 	path = lib/collections
 	url = https://github.com/spaethtech/collections
