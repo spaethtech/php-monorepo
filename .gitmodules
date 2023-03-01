@@ -7,3 +7,24 @@
 [submodule "spaethtech/collections"]
 	path = lib/collections
 	url = https://github.com/spaethtech/collections
+[submodule "spaethtech/support"]
+	path = lib/support
+	url = https://github.com/spaethtech/support
+[submodule "spaethtech/templating"]
+	path = lib/templating
+	url = https://github.com/spaethtech/templating
+[submodule "spaethtech/common"]
+	path = lib/common
+	url = https://github.com/spaethtech/common
+[submodule "spaethtech/data"]
+	path = lib/data
+	url = https://github.com/spaethtech/data
+[submodule "spaethtech/dynamics"]
+	path = lib/dynamics
+	url = https://github.com/spaethtech/dynamics
+[submodule "spaethtech/synchronization"]
+	path = lib/synchronization
+	url = https://github.com/spaethtech/synchronization
+[submodule "spaethtech/rest"]
+	path = lib/rest
+	url = https://github.com/spaethtech/rest
