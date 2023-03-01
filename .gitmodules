@@ -28,3 +28,6 @@
 [submodule "spaethtech/annotations"]
 	path = lib/annotations
 	url = https://github.com/spaethtech/annotations
+[submodule "spaethtech/slim"]
+	path = lib/slim
+	url = https://github.com/spaethtech/slim
