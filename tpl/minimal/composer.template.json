@@ -1,0 +1,12 @@
+{
+    "name": "spaethtech/{{PACKAGE_NAME}}",
+    "description": "{{PACKAGE_DESCRIPTION}}",
+    "require-dev": {
+        "consolidation/robo": "^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "SpaethTech\\{{PACKAGE_NAMESPACE}}\\": "src/"
+        }
+    }
+}

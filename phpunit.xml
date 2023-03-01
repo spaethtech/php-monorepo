@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit
+    bootstrap                   = "vendor/autoload.php"
+    backupGlobals               = "false"
+    backupStaticAttributes      = "false"
+    cacheResultFile             = ".cache/.phpunit.result.cache"
+    colors                      = "true"
+    convertErrorsToExceptions   = "true"
+    convertNoticesToExceptions  = "true"
+    convertWarningsToExceptions = "true"
+    processIsolation            = "false"
+    stopOnFailure               = "false">
+
+    <testsuites>
+        <testsuite name="Annotations">
+            <directory>lib/annotations/tests</directory>
+        </testsuite>
+        <testsuite name="Console">
+            <directory>lib/console/tests/Console</directory>
+        </testsuite>
+        <testsuite name="Support">
+            <directory>lib/support/tests/Support</directory>
+        </testsuite>
+        <testsuite name="Templating">
+            <directory>lib/templating/tests/Templating</directory>
+        </testsuite>
+    </testsuites>
+
+    <coverage
+        cacheDirectory=".cache"
+        includeUncoveredFiles="true"
+        processUncoveredFiles="true"
+        pathCoverage="false"
+        ignoreDeprecatedCodeUnits="true"
+        disableCodeCoverageIgnore="true">
+    </coverage>
+
+    <php>
+        <env name="APP_ENV" value="testing"/>
+    </php>
+
+</phpunit>

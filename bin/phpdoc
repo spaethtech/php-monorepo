@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+
+
+
+
+
+
+#docker run --rm -v %~dp0\..\:/data phpdoc/phpdoc:3
+##--template=vendor/onspli/phpdoc-markdown/templates/public-onefile
