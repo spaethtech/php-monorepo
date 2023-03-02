@@ -37,40 +37,23 @@ final class RoboFile extends Tasks
      *
      * @noinspection PhpUnusedParameterInspection
      */
-    public function packageCreate(ConsoleIO $io, string $name, string $namespace = null, string $description = null,
-        array $options = [ "template|t" => "minimal", "replace|r" => FALSE ])
+    public function packageCreate(ConsoleIO $io, string $name, array $options = [
+        "dir|d" => self::DEFAULT_PACKAGE_DIR,
+        "force|f" => FALSE,
+        "owner|o" => self::DEFAULT_ORGANIZATION
+    ])
     {
-        if ($name == null || $name == "" || !preg_match(self::REGEX_PACKAGE_NAME, $name))
-            $this->error("<bg=red>Valid package names contain ONLY lower case letters, numbers and hyphens</>", TRUE);
+        // IMPORTANT: Install GitHub CLI from https://cli.github.com/
 
-        if (file_exists($existing = $this->normalize_path(__DIR__."/lib/$name")))
-        {
-            if($options["replace"] || $this->askYesNo("Replace existing package?"))
-            {
-                $this->warning("Replacing existing package");
-                $this->_deleteDir($existing);
-            }
-            else
-            {
-                $this->error("A package with the same name already exists.  " .
-                    "Use --replace or choose Y when prompted to replace", TRUE);
-            }
-        }
+        // git submodule add --name spaethtech/phpdoc-markdown lib/phpdoc-markdown
 
-        if ($namespace == null || $namespace == "")
-            $namespace = ucfirst($name);
+        // Branch master to main
+        // cd lib/<package>
+        // git branch -m master main && git push -u origin main && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main
+        // MANUAL: https://github.com/spaethtech/common/settings/branches
+        // git push origin --delete master
 
-        if (!preg_match(self::REGEX_PACKAGE_NAMESPACE, $namespace))
-            $this->error("<bg=red>Valid package namespaces start with an uppercase letter and contain ONLY letters, " .
-                "numbers and underscores</>", TRUE);
 
-        $description ??= $description;
-
-        $this->template(__DIR__."/tpl/minimal", __DIR__."/lib/$name", [
-            "PACKAGE_NAME" => $name,
-            "PACKAGE_NAMESPACE" => $namespace,
-            "PACKAGE_DESCRIPTION" => $description,
-        ]);
 
     }
 
