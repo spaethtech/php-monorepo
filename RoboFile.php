@@ -3,9 +3,6 @@ declare(strict_types=1);
 
 use Robo\Symfony\ConsoleIO;
 use Robo\Tasks;
-use SpaethTech\Support\FileSystem;
-use Symfony\Component\Console\Input\InputOption;
-//use SpaethTech\Robo\Task\Vcs\GitStack;
 use SpaethTech\Robo\Task\MonoRepo;
 
 require_once __DIR__."/vendor/autoload.php";
@@ -78,11 +75,6 @@ final class RoboFile extends Tasks
     }
 
 
-    private const PACKAGE_OPTIONS = [
-        "dir|d" => self::DEFAULT_PACKAGE_DIR,
-        "force|f" => FALSE,
-        "owner|o" => self::DEFAULT_ORGANIZATION
-    ];
 
     /**
      * Clones an existing package from GitHub to the monorepo
@@ -90,12 +82,16 @@ final class RoboFile extends Tasks
      * @param string    $name               The name of the package
      *
      * @option string   $dir                The base directory for packages, relative to this RoboFile
-     * @option string   $owner              The owner of the package
      * @option string   $force              Forces replacement of an existing package
+     * @option string   $owner              The owner of the package
      *
      * @noinspection PhpUnusedParameterInspection
      */
-    public function packageAdd(ConsoleIO $io, string $name, array $options = self::PACKAGE_OPTIONS)
+    public function packageAdd(ConsoleIO $io, string $name, array $options = [
+        "dir|d" => self::DEFAULT_PACKAGE_DIR,
+        "force|f" => FALSE,
+        "owner|o" => self::DEFAULT_ORGANIZATION
+    ])
     {
         $this->taskPackageAdd($name)
             ->dir($options["dir"])
@@ -111,12 +107,16 @@ final class RoboFile extends Tasks
      * @param string    $name               The name of the package
      *
      * @option string   $dir                The base directory for packages, relative to this RoboFile
-     * @option string   $owner              The owner of the package
      * @option string   $force              Forces replacement of an existing package
+     * @option string   $owner              The owner of the package
      *
      * @noinspection PhpUnusedParameterInspection
      */
-    public function packageRemove(ConsoleIO $io, string $name, array $options = self::PACKAGE_OPTIONS)
+    public function packageRemove(ConsoleIO $io, string $name, array $options = [
+        "dir|d" => self::DEFAULT_PACKAGE_DIR,
+        "force|f" => FALSE,
+        "owner|o" => self::DEFAULT_ORGANIZATION
+    ])
     {
         $this->taskPackageRemove($name)
             ->dir($options["dir"])
@@ -125,8 +125,63 @@ final class RoboFile extends Tasks
             ->run();
     }
 
+    /**
+     * Removes an existing package from the monorepo
+     *
+     * @param string    $name               The name of the package
+     *
+     * @option string   $dir                The base directory for packages, relative to this RoboFile
+     * @option string   $owner              The owner of the package
+     *
+     * @noinspection PhpUnusedParameterInspection
+     */
+    public function packageDoc(ConsoleIO $io, string $name, array $options = [
+        "dir|d" => self::DEFAULT_PACKAGE_DIR,
+        "owner|o" => self::DEFAULT_ORGANIZATION
+    ])
+    {
+        $path = "${options["dir"]}/$name";
+        $name = "${options["owner"]}/$name";
+
+        if (!file_exists($path))
+            $this->error("Package not found!", TRUE);
+
+        $full = realpath(PROJECT_DIR);
+
+        $dependency = "onspli/phpdoc-markdown";
+        $template   = "$dependency/templates/public-onefile";
+
+        //$templateSource = "https://github.com/dmarkic/phpdoc3-template-md.git";
 
 
+        if (!file_exists(PROJECT_DIR."/vendor/$template"))
+            $this->taskComposerRequire()
+                ->dependency($dependency)
+                ->dev()
+                //->ignorePlatformRequirements("ext-xsl")
+                ->run();
+
+        //$this->taskGitStack()
+        //    ->cloneShallow($templateSource, $templatePath = PROJECT_DIR."/templates/dmarkic")
+        //    ->run();
+
+        //$this->_exec("rm -rf $templatePath/.git");
+
+        $this->_exec(
+            "docker run --rm ".
+            "-v $full:/data ".
+            "phpdoc/phpdoc ".
+            "--directory /data/$path/src ".
+            "--target /data/$path ".
+            "--cache-folder /data/.cache/$name/.phpdoc/ ".
+            "--title $name ".
+            //"--template=/data/vendor/$template"
+            //"--template=/data/templates/dmarkic/themes/md"
+            "--template=/data/templates/phpdoc/multi-file"
+            //"--template=/data/templates/phpdoc/github/data/templates/contao"
+        );
+
+    }
 
 
 
@@ -197,7 +252,7 @@ final class RoboFile extends Tasks
     private function template(string $source, string $destination, array $variables = [])
     {
 
-        $this->taskTemplate()->
+        //$this->taskTemplate()->
 
 
         exit;
