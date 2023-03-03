@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4c70896f74d0a607cef83fdbf5b44421",
+    "content-hash": "92191f2e227db74ef3f11f97a1cdae7b",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -1687,8 +1687,42 @@
             "time": "2022-07-20T18:31:45+00:00"
         },
         {
+            "name": "spaethtech/phpdoc-markdown",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "lib/phpdoc-markdown",
+                "reference": "681f548f097f1eb54d6f5d7786799a7495e23e7d"
+            },
+            "require": {
+                "php": ">=7.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SpaethTech\\": "src/",
+                    "Examples\\": "examples/",
+                    "Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ryan Spaeth",
+                    "email": "rspaeth@spaethtech.com"
+                }
+            ],
+            "description": "A phpDocumentor markdown template for our projects.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "spaethtech/robo",
-            "version": "dev-master",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "lib/robo",
@@ -4837,7 +4871,8 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "spaethtech/robo": 20
+        "spaethtech/robo": 20,
+        "spaethtech/phpdoc-markdown": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

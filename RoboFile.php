@@ -131,18 +131,14 @@ final class RoboFile extends Tasks
 
         $full = realpath(PROJECT_DIR);
 
-        $dependency = "onspli/phpdoc-markdown";
-        $template   = "$dependency/templates/public-onefile";
+        $template   = "multi-file";
 
-        //$templateSource = "https://github.com/dmarkic/phpdoc3-template-md.git";
-
-
-        if (!file_exists(PROJECT_DIR."/vendor/$template"))
-            $this->taskComposerRequire()
-                ->dependency($dependency)
-                ->dev()
-                //->ignorePlatformRequirements("ext-xsl")
-                ->run();
+//        if (!file_exists(PROJECT_DIR."/vendor/spaethtech/phpdoc-markdown"))
+//            $this->taskComposerRequire()
+//                ->dependency("spaethtech/phpdoc-markdown")
+//                ->dev()
+//                //->ignorePlatformRequirements("ext-xsl")
+//                ->run();
 
         //$this->taskGitStack()
         //    ->cloneShallow($templateSource, $templatePath = PROJECT_DIR."/templates/dmarkic")
@@ -158,10 +154,7 @@ final class RoboFile extends Tasks
             "--target /data/$path ".
             "--cache-folder /data/.cache/$name/.phpdoc/ ".
             "--title $name ".
-            //"--template=/data/vendor/$template"
-            //"--template=/data/templates/dmarkic/themes/md"
-            "--template=/data/templates/phpdoc/multi-file"
-            //"--template=/data/templates/phpdoc/github/data/templates/contao"
+            "--template=/data/lib/phpdoc-markdown/templates/$template"
         );
 
     }
