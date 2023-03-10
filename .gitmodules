@@ -37,3 +37,6 @@
 [submodule "spaethtech/slim-twig"]
 	path = lib/slim-twig
 	url = https://github.com/spaethtech/slim-twig
+[submodule "spaethtech/phpdoc"]
+	path = lib/phpdoc
+	url = https://github.com/spaethtech/phpdoc
