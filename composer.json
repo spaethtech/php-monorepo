@@ -10,7 +10,9 @@
         "symfony/console": "^5.4",
         "consolidation/robo": "^4.0",
         "spaethtech/robo": "@dev",
-        "spaethtech/phpdoc-markdown": "@dev"
+        "spaethtech/phpdoc-markdown": "@dev",
+        "vlucas/phpdotenv": "^5.5",
+        "ext-curl": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "^9",

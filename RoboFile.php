@@ -1,4 +1,9 @@
-<?php /** @noinspection PhpUnused */
+<?php
+/**
+ * @noinspection PhpUnused
+ * @noinspection PhpUnusedParameterInspection
+ * @noinspection PhpUnusedPrivateMethodInspection
+ */
 declare(strict_types=1);
 
 use Robo\Symfony\ConsoleIO;
@@ -11,97 +16,33 @@ final class RoboFile extends Tasks
 {
     use MonoRepo\Tasks;
 
-
-    private const DEFAULT_GIT_PROVIDER  = "https://github.com";
-    private const DEFAULT_ORGANIZATION  = "spaethtech";
-
-    private const DEFAULT_PACKAGE_DIR   = "lib";
-
-
-    //use Templating\Tasks;
-
-    private const REGEX_PACKAGE_NAME        = "/^[a-z0-9-]+$/";
-    private const REGEX_PACKAGE_NAMESPACE   = "/^[A-Z]+[A-Za-z0-9_]*$/";
+    private const GIT_PROVIDER      = "https://github.com";
+    private const ORGANIZATION      = "spaethtech";
+    private const MONOREPO_DIR      = "lib";
+    private const REGEX_OWNER       = "/^[a-z0-9-]+$/";
+    private const REGEX_NAME        = "/^[a-z0-9-]+$/";
+    private const REGEX_NAMESPACE   = "/^[A-Z]+[A-Za-z0-9_]*$/";
 
     /**
-     * Creates a
+     * @command lib:add
      *
-     * @param string $name                  The name of the package
-     * @param string|null $description      An optional description of the package
-     * @param string|null $namespace        The package namespace
+     * Clones an existing repository into the monorepo, as a library
      *
-     * @option string $replace              Forces replacement of an existing package
-     * @option string $template             The template to use when creating the package
+     * @param string    $name       The name of the library
      *
-     * @return void
+     * @option string   $dir        The base directory for libraries, relative to this RoboFile
+     * @option string   $force      Forces replacement of an existing library
+     * @option string   $owner      The owner of the library
      *
      * @noinspection PhpUnusedParameterInspection
      */
-    public function packageCreate(ConsoleIO $io, string $name, array $options = [
-        "dir|d" => self::DEFAULT_PACKAGE_DIR,
+    public function libraryAdd(ConsoleIO $io, string $name, array $options = [
+        "dir|d" => self::MONOREPO_DIR,
         "force|f" => FALSE,
-        "owner|o" => self::DEFAULT_ORGANIZATION
+        "owner|o" => self::ORGANIZATION
     ])
     {
-        // IMPORTANT: Install GitHub CLI from https://cli.github.com/
-
-        // git submodule add --name spaethtech/phpdoc-markdown lib/phpdoc-markdown
-
-        // Branch master to main
-        // cd lib/<package>
-        // git branch -m master main && git push -u origin main && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main
-        // MANUAL: https://github.com/spaethtech/common/settings/branches
-        // git push origin --delete master
-
-
-
-    }
-
-
-
-    /**
-     * Clones an existing package from GitHub to the monorepo
-     *
-     * @param string    $name               The name of the package
-     *
-     * @option string   $dir                The base directory for packages, relative to this RoboFile
-     * @option string   $force              Forces replacement of an existing package
-     * @option string   $owner              The owner of the package
-     *
-     * @noinspection PhpUnusedParameterInspection
-     */
-    public function packageAdd(ConsoleIO $io, string $name, array $options = [
-        "dir|d" => self::DEFAULT_PACKAGE_DIR,
-        "force|f" => FALSE,
-        "owner|o" => self::DEFAULT_ORGANIZATION
-    ])
-    {
-        $this->taskPackageAdd($name)
-            ->dir($options["dir"])
-            ->owner($options["owner"])
-            ->force($options["force"])
-            ->run();
-    }
-
-
-    /**
-     * Removes an existing package from the monorepo
-     *
-     * @param string    $name               The name of the package
-     *
-     * @option string   $dir                The base directory for packages, relative to this RoboFile
-     * @option string   $force              Forces replacement of an existing package
-     * @option string   $owner              The owner of the package
-     *
-     * @noinspection PhpUnusedParameterInspection
-     */
-    public function packageRemove(ConsoleIO $io, string $name, array $options = [
-        "dir|d" => self::DEFAULT_PACKAGE_DIR,
-        "force|f" => FALSE,
-        "owner|o" => self::DEFAULT_ORGANIZATION
-    ])
-    {
-        $this->taskPackageRemove($name)
+        $this->taskLibraryAdd($name)
             ->dir($options["dir"])
             ->owner($options["owner"])
             ->force($options["force"])
@@ -109,18 +50,46 @@ final class RoboFile extends Tasks
     }
 
     /**
-     * Removes an existing package from the monorepo
+     * @command lib:del
      *
-     * @param string    $name               The name of the package
+     * Removes an existing library from the monorepo
      *
-     * @option string   $dir                The base directory for packages, relative to this RoboFile
-     * @option string   $owner              The owner of the package
+     * @param string    $name       The name of the library
+     *
+     * @option string   $dir        The base directory for libraries, relative to this RoboFile
+     * @option string   $force      Forces replacement of an existing library
+     * @option string   $owner      The owner of the library
      *
      * @noinspection PhpUnusedParameterInspection
      */
-    public function packageDoc(ConsoleIO $io, string $name, array $options = [
-        "dir|d" => self::DEFAULT_PACKAGE_DIR,
-        "owner|o" => self::DEFAULT_ORGANIZATION
+    public function libraryDel(ConsoleIO $io, string $name, array $options = [
+        "dir|d" => self::MONOREPO_DIR,
+        "force|f" => FALSE,
+        "owner|o" => self::ORGANIZATION
+    ])
+    {
+        $this->taskLibraryDel($name)
+            ->dir($options["dir"])
+            ->owner($options["owner"])
+            ->force($options["force"])
+            ->run();
+    }
+
+    /**
+     * @command lib:doc
+     *
+     * Generates documentation for an existing library in the monorepo
+     *
+     * @param string    $name               The name of the library
+     *
+     * @option string   $dir                The base directory for libraries, relative to this RoboFile
+     * @option string   $owner              The owner of the library
+     *
+     * @noinspection PhpUnusedParameterInspection
+     */
+    public function libraryDoc(ConsoleIO $io, string $name, array $options = [
+        "dir|d" => self::MONOREPO_DIR,
+        "owner|o" => self::ORGANIZATION
     ])
     {
         $path = "${options["dir"]}/$name";
@@ -140,10 +109,6 @@ final class RoboFile extends Tasks
 //                //->ignorePlatformRequirements("ext-xsl")
 //                ->run();
 
-        //$this->taskGitStack()
-        //    ->cloneShallow($templateSource, $templatePath = PROJECT_DIR."/templates/dmarkic")
-        //    ->run();
-
         //$this->_exec("rm -rf $templatePath/.git");
 
         $this->_exec(
@@ -159,6 +124,47 @@ final class RoboFile extends Tasks
 
     }
 
+    /**
+     * @command lib:new
+     *
+     * Creates a new library
+     *
+     * @param string $name                  The name of the library
+     *
+     * @option string $replace              Forces replacement of an existing library
+     * @option string $template             The template to use when creating the library
+     *
+     * @return void
+     *
+     * @noinspection PhpUnusedParameterInspection
+     */
+    public function libraryNew(ConsoleIO $io, string $name, array $options = [
+        "dir|d" => self::MONOREPO_DIR,
+        "force|f" => FALSE,
+        "owner|o" => self::ORGANIZATION
+    ])
+    {
+        // IMPORTANT: Install GitHub CLI from https://cli.github.com/
+
+        $this->taskLibraryNew($name)
+            ->env("GH_TOKEN", "TESTING")
+            ->dir($options["dir"])
+            ->owner($options["owner"])
+            ->force($options["force"])
+            ->run();
+
+
+        // git submodule add --name spaethtech/phpdoc-markdown lib/phpdoc-markdown
+
+        // Branch master to main
+        // cd lib/<package>
+        // git branch -m master main && git push -u origin main && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main
+        // MANUAL: https://github.com/spaethtech/common/settings/branches
+        // git push origin --delete master
+
+
+
+    }
 
 
 
