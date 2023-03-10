@@ -13,17 +13,47 @@
     stopOnFailure               = "false">
 
     <testsuites>
-        <testsuite name="Annotations">
+        <testsuite name="annotations">
             <directory>lib/annotations/tests</directory>
         </testsuite>
-        <testsuite name="Console">
-            <directory>lib/console/tests/Console</directory>
+        <testsuite name="collections">
+            <directory>lib/collections/tests</directory>
         </testsuite>
-        <testsuite name="Support">
-            <directory>lib/support/tests/Support</directory>
+        <testsuite name="common">
+            <directory>lib/common/tests</directory>
         </testsuite>
-        <testsuite name="Templating">
-            <directory>lib/templating/tests/Templating</directory>
+        <testsuite name="data">
+            <directory>lib/data/tests</directory>
+        </testsuite>
+        <testsuite name="dynamics">
+            <directory>lib/dynamics/tests</directory>
+        </testsuite>
+        <testsuite name="phpdoc">
+            <directory>lib/phpdoc/tests</directory>
+        </testsuite>
+        <testsuite name="rest">
+            <directory>lib/rest/tests</directory>
+        </testsuite>
+        <testsuite name="robo">
+            <directory>lib/robo/tests</directory>
+        </testsuite>
+        <testsuite name="slim">
+            <directory>lib/slim/tests</directory>
+        </testsuite>
+        <testsuite name="slim-twig">
+            <directory>lib/slim-twig/tests</directory>
+        </testsuite>
+        <testsuite name="support">
+            <directory>lib/support/tests</directory>
+        </testsuite>
+        <testsuite name="synchronization">
+            <directory>lib/synchronization/tests</directory>
+        </testsuite>
+        <testsuite name="templating">
+            <directory>lib/templating/tests</directory>
+        </testsuite>
+        <testsuite name="twig">
+            <directory>lib/twig/tests</directory>
         </testsuite>
     </testsuites>
 
