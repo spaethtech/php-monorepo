@@ -1,3 +1,6 @@
 [submodule "spaethtech/php-support"]
 	path = lib/php-support
 	url = https://github.com/spaethtech/php-support
+[submodule "spaethtech/php-collections"]
+	path = lib/php-collections
+	url = https://github.com/spaethtech/php-collections
