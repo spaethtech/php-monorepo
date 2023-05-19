@@ -1,0 +1,90 @@
+{
+    "name": "spaethtech/php-monorepo",
+    "description": "The mono repo for all of our PHP libraries.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ryan Spaeth",
+            "email": "rspaeth@spaethtech.com"
+        }
+    ],
+    "type": "monorepo",
+    "require": {
+        "composer/composer": "^2.5",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "php": ">=7.4",
+        "spaethtech/annotations": "@dev",
+        "spaethtech/collections": "@dev",
+        "spaethtech/common": "@dev"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9",
+        "symplify/monorepo-builder": "11.2.3.72"
+    },
+    "autoload": {
+        "files": [
+            "globals.php"
+        ],
+        "psr-4": {
+            "Examples\\": [
+                "lib/php-annotations/examples/",
+                "lib/php-phpdoc/examples/",
+                "lib/php-support/examples/"
+            ],
+            "SpaethTech\\": [
+                "lib/php-annotations/src/",
+                "lib/php-collections/src/",
+                "lib/php-dynamics/./src/",
+                "lib/php-dynamics/src/",
+                "lib/php-phpdoc/src/",
+                "lib/php-support/src/"
+            ],
+            "Tests\\": [
+                "lib/php-annotations/tests/",
+                "lib/php-phpdoc/tests/",
+                "lib/php-support/tests/"
+            ]
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Examples\\": [
+                "lib/php-annotations/examples/",
+                "lib/php-collections/examples/",
+                "lib/php-dynamics/examples/",
+                "lib/php-phpdoc/examples/",
+                "lib/php-support/examples/"
+            ],
+            "SpaethTech\\": [
+                "lib/php-collections/./tests/",
+                "lib/php-dynamics/./tests/"
+            ],
+            "Tests\\": [
+                "lib/php-annotations/tests/",
+                "lib/php-collections/tests/",
+                "lib/php-dynamics/tests/",
+                "lib/php-phpdoc/tests/",
+                "lib/php-support/tests/"
+            ]
+        }
+    },
+    "replace": {
+        "spaethtech/php-annotations": "self.version",
+        "spaethtech/php-collections": "self.version",
+        "spaethtech/php-dynamics": "self.version",
+        "spaethtech/php-phpdoc": "self.version",
+        "spaethtech/php-support": "self.version"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "lib/*",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit
+    bootstrap                   = "vendor/autoload.php"
+    backupGlobals               = "false"
+    backupStaticAttributes      = "false"
+    cacheResultFile             = ".cache/.phpunit.result.cache"
+    colors                      = "true"
+    convertErrorsToExceptions   = "true"
+    convertNoticesToExceptions  = "true"
+    convertWarningsToExceptions = "true"
+    processIsolation            = "false"
+    stopOnFailure               = "false">
+
+    <testsuites>
+        <testsuite name="php-annotations">
+            <directory>lib/php-annotations/tests</directory>
+        </testsuite>
+        <testsuite name="php-collections">
+            <directory>lib/php-collections/tests</directory>
+        </testsuite>
+        <testsuite name="php-data">
+            <directory>lib/php-data/tests</directory>
+        </testsuite>
+        <testsuite name="php-dynamics">
+            <directory>lib/php-dynamics/tests</directory>
+        </testsuite>
+        <testsuite name="php-phpdoc">
+            <directory>lib/php-phpdoc/tests</directory>
+        </testsuite>
+        <testsuite name="php-rest">
+            <directory>lib/php-rest/tests</directory>
+        </testsuite>
+        <testsuite name="php-robo">
+            <directory>lib/php-robo/tests</directory>
+        </testsuite>
+        <testsuite name="php-slim">
+            <directory>lib/php-slim/tests</directory>
+        </testsuite>
+<!--        <testsuite name="php-slim-twig">-->
+<!--            <directory>lib/php-slim-twig/tests</directory>-->
+<!--        </testsuite>-->
+        <testsuite name="php-support">
+            <directory>lib/php-support/tests</directory>
+        </testsuite>
+        <testsuite name="php-synchronization">
+            <directory>lib/php-synchronization/tests</directory>
+        </testsuite>
+        <testsuite name="php-templating">
+            <directory>lib/php-templating/tests</directory>
+        </testsuite>
+        <testsuite name="php-twig">
+            <directory>lib/php-twig/tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <coverage
+        cacheDirectory=".cache"
+        includeUncoveredFiles="true"
+        processUncoveredFiles="true"
+        pathCoverage="false"
+        ignoreDeprecatedCodeUnits="true"
+        disableCodeCoverageIgnore="true">
+    </coverage>
+
+    <php>
+        <env name="php-APP_ENV" value="testing"/>
+    </php>
+
+</phpunit>
