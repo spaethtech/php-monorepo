@@ -4,6 +4,3 @@
 [submodule "spaethtech/php-collections"]
 	path = lib/php-collections
 	url = https://github.com/spaethtech/php-collections
-[submodule "spaethtech/php-robo-monorepo"]
-	path = lib/php-robo-monorepo
-	url = https://github.com/spaethtech/php-robo-monorepo.git
