@@ -10,3 +10,6 @@
 [submodule "spaethtech/php"]
 	path = lib/php
 	url = https://github.com/spaethtech/php
+[submodule "spaethtech/phP"]
+	path = lib/phP
+	url = https://github.com/spaethtech/phP
