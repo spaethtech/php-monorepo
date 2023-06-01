@@ -7,3 +7,6 @@
 [submodule "spaethtech/php-phpdoc"]
 	path = lib/php-phpdoc
 	url = https://github.com/spaethtech/php-phpdoc
+[submodule "spaethtech/php-robo-monorepo"]
+	path = lib/php-robo-monorepo
+	url = https://github.com/spaethtech/php-robo-monorepo
