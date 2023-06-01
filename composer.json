@@ -22,7 +22,6 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^9",
-        "symplify/monorepo-builder": "11.2.3.72",
         "consolidation/robo": "^4"
     },
     "autoload": {

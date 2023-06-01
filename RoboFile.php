@@ -20,102 +20,124 @@ require_once __DIR__."/vendor/autoload.php";
 final class RoboFile extends Tasks
 {
     //use MonoRepo\Tasks;
+    use App\Robo\Task\PhpStorm\loadTasks;
 
-    private const GIT_PROVIDER      = "https://github.com";
-    private const ORGANIZATION      = "spaethtech";
-    private const MONOREPO_DIR      = "lib";
-    private const REGEX_OWNER       = "/^[a-z0-9-]+$/";
-    private const REGEX_NAME        = "/^[a-z0-9-]+$/";
+    private const DEFAULT_GIT_URL   = "https://github.com";
+    private const DEFAULT_MOD_ORG   = "spaethtech";
+    private const DEFAULT_MOD_DIR   = "lib";
+
+    private const REGEX_ORG_NAME    = "/^[a-z0-9-]+$/";
+    private const REGEX_MOD_NAME    = "/^[a-z0-9-]+$/";
+
     private const REGEX_NAMESPACE   = "/^[A-Z]+[A-Za-z0-9_]*$/";
 
     /**
-     * @command lib:add
+     * @command mod:add
      *
-     * Clones an existing repository into the monorepo, as a library
+     * Clones an existing repository into the monorepo, as a submodule
      *
-     * @param string $name The name of the library
+     * @param string $name  The name of the submodule
      *
-     * @option string   $dir        The base directory for libraries, relative to this RoboFile
-     * @option string   $force      Forces replacement of an existing library
-     * @option string   $owner      The owner of the library
+     * @option string $dir  The submodules directory, relative to this RoboFile
+     * @option string $org  The organization/owner of the repository
      *
      * @noinspection PhpUnusedParameterInspection
      * @throws TaskException
      */
-    public function libAdd(ConsoleIO $io, string $name, array $options = [
-        "dir|d" => self::MONOREPO_DIR,
-        "org|o" => self::ORGANIZATION
+    public function modAdd(ConsoleIO $io, string $name, array $options = [
+        "dir|d" => self::DEFAULT_MOD_DIR,
+        "org|o" => self::DEFAULT_MOD_ORG
     ]): void
     {
-        $org = $io->input()->getOption("org");
+        /** @noinspection DuplicatedCode */
         $dir = $io->input()->getOption("dir");
-        $url = "https://github.com/$org/$name";
+        $org = $io->input()->getOption("org");
 
-        $path = "$dir/$name";
+        if (!preg_match(self::REGEX_ORG_NAME, $org))
+            die("Invalid organization name, must match: ".self::REGEX_ORG_NAME);
+
+        if (!preg_match(self::REGEX_MOD_NAME, $name))
+            die("Invalid repository name, must match: ".self::REGEX_MOD_NAME);
+
+        $lib = "$dir/$name";
+        $mod = "$org/$name";
+        $url = self::DEFAULT_GIT_URL."/$mod";
+
+        if (file_exists($lib))
+            die("Submodule has already been added!");
+
+        exec("git ls-remote $url -q 2>&1 /dev/null", $output, $result);
+        if ($result > 0)
+            die("A valid Git repository could not be located at: $url\n");
 
         $result = $this->taskExecStack()
             ->executable("git")
             ->exec("reset")
-            ->exec("submodule add --name $org/$name $url $path")
+            ->exec("submodule add --name $mod $url $lib")
             ->exec("add .gitmodules")
-            ->exec("add lib")
-            ->exec("commit -m \"Added submodule $name to repository\"")
+            ->exec("add $lib")
+            ->exec("commit -m \"Added submodule $mod to repository\"")
             ->run();
 
         if ($result->wasSuccessful())
-            $this->taskVcs()->add($path, "Git")->run();
+            $this->taskVcs()->add($lib, "Git")->run();
     }
 
-
     /**
-     * @command lib:del
+     * @command mod:del
      *
-     * Removes an existing library from the monorepo
+     * Removes a submodule from the monorepo
      *
-     * @param string $name The name of the library
+     * @param string $name  The name of the submodule
      *
-     * @option string   $dir        The base directory for libraries, relative to this RoboFile
-     * @option string   $force      Forces replacement of an existing library
-     * @option string   $owner      The owner of the library
+     * @option string $dir  The submodules directory, relative to this RoboFile
+     * @option string $org  The organization/owner of the repository
      *
      * @noinspection PhpUnusedParameterInspection
      * @throws TaskException
      */
-    public function libraryDel(ConsoleIO $io, string $name, array $options = [
-        "dir|d" => self::MONOREPO_DIR,
-        "org|o" => self::ORGANIZATION
-    ])
+    public function modDel(ConsoleIO $io, string $name, array $options = [
+        "dir|d" => self::DEFAULT_MOD_DIR,
+        "org|o" => self::DEFAULT_MOD_ORG
+    ]): void
     {
-//        $this->taskLibraryDel($name)
-//            ->dir($options["dir"])
-//            ->owner($options["owner"])
-//            ->force($options["force"])
-//            ->run();
-
-        $org = $io->input()->getOption("org");
+        /** @noinspection DuplicatedCode */
         $dir = $io->input()->getOption("dir");
-        $url = "https://github.com/$org/$name";
+        $org = $io->input()->getOption("org");
 
-        $path = "$dir/$name";
+        if (!preg_match(self::REGEX_ORG_NAME, $org))
+            die("Invalid organization name, must match: ".self::REGEX_ORG_NAME);
+
+        if (!preg_match(self::REGEX_MOD_NAME, $name))
+            die("Invalid repository name, must match: ".self::REGEX_MOD_NAME);
+
+        $lib = "$dir/$name";
+        $mod = "$org/$name";
+        $url = self::DEFAULT_GIT_URL."/$mod";
+
+        if (file_exists($lib) && !$this->askYesNo("Delete submodule $mod?"))
+            return;
+
+        // NOTE: IF the module directory does not exist, we still run the Tasks.
+        // This is to clean up any dangling files and/org config.
 
         $this->taskExecStack()
             ->executable("git")
             ->exec("reset")
-            ->exec("submodule deinit -f $path")
+            ->exec("submodule deinit -f $lib")
+            ->run();
+
+        $this->taskExecStack()
+            ->executable("git")
+            ->exec("rm --cached $lib")
             ->run();
 
         $file = __DIR__."/.gitmodules";
 
-
         $pattern = /** @lang RegExp */
-            "|^\[submodule \"(?<name>.*)\"]$".
-            "\s*path = (?<path>$path)$".
-            "\s*url = (?<url>.*)$\s*|m";
-
-        $this->taskExecStack()
-            ->executable("git")
-            ->exec("rm --cached $path")
-            ->run();
+            "|^\[submodule \"(?<name>$mod)\"]$".
+            "\s*path = (?<path>$lib)$".
+            "\s*url = (?<url>$url)$\s*|m";
 
         $contents = file_get_contents($file);
         $contents = preg_replace($pattern, "", $contents);
@@ -123,21 +145,23 @@ final class RoboFile extends Tasks
 
         $this->taskExecStack()
             ->executable("git")
-            ->exec("add $path")
+            ->exec("add $lib")
             ->exec("add .gitmodules")
-            ->exec("commit -m \"Removed submodule $org/$name from repository\"")
+            ->exec("commit -m \"Removed submodule $mod from repository\"")
             ->run();
 
-        $this->taskDeleteDir([ ".git/modules/$path", $path ])
+        $this->taskExecStack()
+            ->executable("bash")
+            ->exec("-c 'rm -rf $lib .git/modules/$mod'")
             ->run();
 
-        $this->taskVcs()->del($path)->run();
+        $this->taskVcs()->del($lib)->run();
     }
 
     /**
-     * @command lib:doc
+     * @command mod:doc
      *
-     * Generates documentation for an existing library in the monorepo
+     * Generates documentation for an submodule in the monorepo
      *
      * @param string    $name               The name of the library
      *
@@ -146,289 +170,45 @@ final class RoboFile extends Tasks
      *
      * @noinspection PhpUnusedParameterInspection
      */
-    public function libraryDoc(ConsoleIO $io, string $name, array $options = [
-        "dir|d" => self::MONOREPO_DIR,
-        "owner|o" => self::ORGANIZATION
-    ])
+    public function modDoc(ConsoleIO $io, string $name, array $options = [
+        "dir|d" => self::DEFAULT_MOD_DIR,
+        "org|o" => self::DEFAULT_MOD_ORG
+    ]): void
     {
-        $path = "${options["dir"]}/$name";
-        $name = "${options["owner"]}/$name";
+        $org = $io->input()->getOption("org");
+        $dir = $io->input()->getOption("dir");
+        $mod = "$org/$name";
+        $lib = "$dir/$name";
 
-        if (!file_exists($path))
-            $this->error("Package not found!", TRUE);
+        if (!file_exists($lib))
+            die("Submodule not found at: $lib");
 
         $full = realpath(PROJECT_DIR);
+
+        if(!file_exists("$full/$dir/php-phpdoc"))
+            die("Submodule spaethtech/php-phpdoc was not found, ".
+                "but can be added using the command:\n".
+                "\n".
+                "    robo mod:add php-phpdoc".
+                "\n"
+            );
 
         $this->_exec(
             "docker run --rm ".
             "-v $full:/data ".
             "phpdoc/phpdoc ".
-            "--directory /data/$path/src ".
-            "--target /data/$path ".
-            "--cache-folder /data/.cache/$name/.phpdoc/ ".
-            "--title $name ".
-            "--template=/data/lib/phpdoc-markdown/templates/markdown"
+            "--directory /data/$lib/src ".
+            "--target /data/$lib ".
+            "--cache-folder /data/.cache/$mod/.phpdoc/ ".
+            "--title $mod ".
+            "--template=/data/lib/php-phpdoc/templates/markdown"
         );
 
     }
 
-    /**
-     * @command lib:new
-     *
-     * Creates a new library
-     *
-     * @param string $name                  The name of the library
-     *
-     * @option string $replace              Forces replacement of an existing library
-     * @option string $template             The template to use when creating the library
-     *
-     * @return void
-     *
-     * @noinspection PhpUnusedParameterInspection
-     */
-    public function libraryNew(ConsoleIO $io, string $name, array $options = [
-        "dir|d" => self::MONOREPO_DIR,
-        "force|f" => FALSE,
-        "owner|o" => self::ORGANIZATION
-    ])
-    {
-        // IMPORTANT: Install GitHub CLI from https://cli.github.com/
-
-        $this->taskLibraryNew($name)
-            ->env("GH_TOKEN", "TESTING")
-            ->dir($options["dir"])
-            ->owner($options["owner"])
-            ->force($options["force"])
-            ->run();
-
-
-        // git submodule add --name spaethtech/phpdoc-markdown lib/phpdoc-markdown
-
-        // Branch master to main
-        // cd lib/<package>
-        // git branch -m master main && git push -u origin main && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main
-        // MANUAL: https://github.com/spaethtech/common/settings/branches
-        // git push origin --delete master
 
 
 
-    }
-
-
-    private const WSL_DOCKER_DIR = PROJECT_DIR."/wsl/docker";
-    private const WSL_DOCKER_PHP = self::WSL_DOCKER_DIR."/php";
-    private const WSL_DOCKER_OUT = self::WSL_DOCKER_DIR."/images";
-
-
-    /**
-     * @param string $version The version of PHP to build
-     *
-     * @option bool $wsl            Import the image as a WSL distribution after a successful build
-     *
-     * @return void
-     * @throws Exception
-     */
-    public function wslBuild(ConsoleIO $io, string $version,
-        array $options = [
-            "owner|o" => self::ORGANIZATION,
-            "wsl|w" => false,
-        ]
-    )
-    {
-        $ver = new Version($version);
-        $own = $io->input()->getOption("owner");
-        $wsl = $io->input()->getOption("wsl");
-        $dir = FileSystem::path(self::WSL_DOCKER_PHP);
-        $out = FileSystem::path(self::WSL_DOCKER_OUT."/php-$ver.tar");
-
-        // Configure individual versions as necessary...
-        switch($ver->getMajorMinor())
-        {
-            case "7.4":
-                $xdebug = ($ver->build >= 20) ? "3.1.6" : "3.0.4";
-                break;
-            case "8.0":
-                $xdebug = ($ver->build >= 7) ? "3.1.6" : "3.0.4";
-                break;
-            case "8.1":
-            case "8.2":
-                $xdebug = "3.2.0";
-                break;
-            default:
-                throw new VersionNotSupportedException("Specified PHP version is not currently supported!");
-        }
-
-
-
-        if (!($file = realpath("$dir/Dockerfile")))
-            throw new DockerfileNotFoundException("Could not find the base Dockerfile!");
-
-        if (($release = $ver->release) !== "" &&
-            (!($dir = realpath("$dir/$release")) || !($file = realpath("$dir/Dockerfile"))))
-            throw new ReleaseNotSupportedException("The specified release is not currently supported!");
-
-        $command = join(" ", [
-            "docker build",
-            "--force-rm",
-            "--tag \"${options["owner"]}/wsl-php:$ver\"",
-            "--build-arg PHP_VERSION=\"$ver\"",
-            "--build-arg XDEBUG_VERSION=\"$xdebug\"",
-            "--file \"$file\"",
-            "\"$dir\""
-            //"."
-        ]);
-
-        $io->writeln("<fg=green>Building the PHP $ver (w/ Xdebug $xdebug)</>");
-        $io->writeln("<fg=cyan> [EXEC] $command</>");
-        passthru($command);
-
-        // -- CREATE -----------------------------------------------------------
-        $command = [
-            "docker create",
-            "\"${options["owner"]}/wsl-php:$ver\""
-        ];
-        $command = $this->sayCommand($command);
-        exec($command, $output, $result);
-
-        if  ($result !== 0)
-            throw new ContainerCreationException("Container creation failed!");
-
-        if (count($output) !== 1)
-            throw new ContainerCreationException("Unexpected output!");
-
-        $containerId = $output[0];
-
-        // -- EXPORT -----------------------------------------------------------
-        $output = FileSystem::path(self::WSL_DOCKER_OUT."/php-$ver.tar");
-
-        if(!file_exists($outputDir = dirname($output)))
-            mkdir($outputDir, 0755, true);
-
-        $command = [
-            "docker export",
-            "--output \"$output\"",
-            $containerId
-        ];
-        $command = $this->sayCommand($command);
-        passthru($command);
-
-        // -- REMOVE -----------------------------------------------------------
-
-        $output = [];
-        $this->execCommand("docker rm ${containerId}", $stdout, $stderr, true, true);
-
-        //var_dump($stdout);
-        //var_dump($stderr);
-
-        //chdir($owd);
-    }
-
-
-    /**
-     * @param array|string $command
-     * @param array|null $stdout
-     * @param array|null $stderr
-     * @param bool $print
-     * @param bool $compact
-     * @param callable|null $filter
-     *
-     * @return int
-     */
-    private function execCommand($command, array &$stdout = null, array &$stderr = null, bool $print = false,
-        bool $compact = false, callable $filter = null): int
-    {
-//        $prefix = " [EXEC]";
-//        $padding = join("", array_fill(0, strlen($prefix), " "));
-
-        $command = $this->sayCommand($command);
-        $process = new Process();
-        $exitcode = $process->execute($command);
-
-        $stdout = $process->getOutput();
-        $stderr = $process->getError();
-
-        if ($print)
-            $process->printOutput($this->output());
-
-        return $exitcode;
-
-
-//        $process = proc_open($command,[ 1 => [ "pipe", "w" ], 2 => [ "pipe", "w" ] ], $pipes);
-//        $stdout = stream_get_contents($pipes[1]);
-//        fclose($pipes[1]);
-//        $stderr = stream_get_contents($pipes[2]);
-//        fclose($pipes[2]);
-//        $result = proc_close($process);
-//
-//        $stdout = ($stdout === false || $stdout === "") ? [] : explode("\n", $stdout);
-//        $stderr = ($stderr === false || $stderr === "") ? [] : explode("\n", $stderr);
-//
-//        if ($compact)
-//        {
-//            $stdout = array_filter($stdout);
-//            $stderr = array_filter($stderr);
-//        }
-//
-//        if ($filter)
-//        {
-//            $stdout = array_filter($stdout, $filter);
-//            $stderr = array_filter($stderr, $filter);
-//        }
-//
-//        if ($print)
-//        {
-//            foreach ($stdout as $line)
-//                $this->writeln("$padding $line");
-//
-//            foreach ($stderr as $line)
-//                $this->writeln("$padding <bg=red>$line</>");
-//        }
-//
-//        return $result;
-    }
-
-
-
-
-    /**
-     * @param array|string $command
-     *
-     * @return void
-     */
-    private function sayCommand(/* ConsoleIO $io, */ $command, bool $multiline = true): string
-    {
-        $prefix = " [EXEC]";
-
-        if (is_array($command))
-        {
-            if (count($command) == 0)
-                return "";
-
-            if (count($command) == 1)
-            {
-                $this->writeln("<fg=cyan>$prefix ${command[0]}</>");
-                return $command[0];
-            }
-
-            if (!$multiline)
-            {
-                $joined = join(" ", $command);
-                $this->writeln("<fg=cyan>$prefix $joined</>");
-                return $joined;
-            }
-
-            $padding = join("", array_fill(0, strlen($prefix), " "));
-
-            $this->writeln("<fg=cyan>$prefix ${command[0]}</>");
-            for($i = 1; $i < count($command); $i++)
-                $this->writeln("<fg=cyan>$padding ${command[$i]}</>");
-
-            return join(" ", $command);
-        }
-
-        $this->writeln("<fg=cyan>$prefix $command</>");
-        return $command;
-    }
 
 
     #region HELPERS
@@ -452,25 +232,23 @@ final class RoboFile extends Tasks
     }
 
     /**
-     * @param string $message               The warning message
+     * @param string $message The warning message
      *
      * @return void
      */
-    private function warning(string $message)
+    private function warning(string $message): void
     {
         $this->writeln("<bg=yellow>$message</>");
     }
 
     /**
-     * @param string $message               The error message
-     * @param bool $die                     Optionally, die() after displaying the message.  Defaults to FALSE
+     * @param string $message The error message
      *
      * @return void
      */
-    private function error(string $message, bool $die = FALSE)
+    private function error(string $message): void
     {
         $this->writeln("<bg=red>$message</>");
-        if ($die) die();
     }
 
     /**
@@ -587,90 +365,10 @@ final class RoboFile extends Tasks
     #endregion
 
 
-    #region PhpStorm XML Commands
-
-    use App\Robo\Task\PhpStorm\loadTasks;
-
-
-
-    /**
-     * @param array<string> $paths
-     *
-     * @return void
-     *
-     * @noinspection PhpDocSignatureIsNotCompleteInspection
-     */
-    public function ideVcsAdd(ConsoleIO $io, array $paths, $options = [
-        "type|t" => "Git"
-    ]): void
-    {
-//        $vcs = match($options["type"])
-//        {
-//            "git", "Git" => VcsType::GIT,
-//            "svn", "subversion", "Subversion" => VcsType::SUBVERSION,
-//            "hg4", "mercurial", "Mercurial" => VcsType::MERCURIAL,
-//            "perforce", "Perforce" => VcsType::PERFORCE,
-//            default => die("Unsupported VCS type provided!")
-//        };
-        //$vcs = VcsType::nearest($options["type"]);
-
-        $type = $io->input()->getOption("type");
-
-        $task = $this->taskVcs();
-
-        foreach ($paths as $path)
-            $task->add($path, $type);
-
-        $task->run();
-
-    }
-
-    /**
-     * @param array<string> $paths
-     *
-     * @return void
-     *
-     * @noinspection PhpDocSignatureIsNotCompleteInspection
-     */
-    public function ideVcsDel(ConsoleIO $io, array $paths): void
-    {
-        $task = $this->taskVcs();
-
-        foreach ($paths as $path)
-            $task->del($path);
-
-        $task->run();
-
-    }
-
-
-    use \App\Robo\Task\Xml\loadTasks;
-
-    public function ideXmlTest(ConsoleIO $io)
-    {
-        $document = new DOMDocument();
-        $document->formatOutput = true;
-        $document->preserveWhiteSpace = false;
-        $document->load(".idea/vcs.xml");
-
-        $this->taskXmlQuery($document)
-            ->expression("//project")
-            ->each(
-                function(DOMElement $element, int $index): void
-                {
-                    print_r($element->getAttribute("version"));
-                }
-            )
-            ->run();
-
-
-    }
 
 
 
 
-
-    #endregion
 
 
 }
