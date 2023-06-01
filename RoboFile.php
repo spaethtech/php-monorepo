@@ -6,25 +6,20 @@
  */
 declare(strict_types=1);
 
-use App\Exceptions\CommandExecutionException;
+use App\Robo\Task\PhpStorm\Vcs\VcsType;
+use Robo\Exception\TaskException;
+use Robo\Result;
 use Robo\Symfony\ConsoleIO;
 use Robo\Tasks;
-use SpaethTech\Robo\Task\MonoRepo;
 use SpaethTech\Support\FileSystem;
 use SpaethTech\Support\Process;
 use SpaethTech\Support\Version;
-use SpaethTech\WSL\Exceptions\ContainerCreationException;
-use SpaethTech\WSL\Exceptions\ContainerRemovalException;
-use SpaethTech\WSL\Exceptions\DockerfileNotFoundException;
-use SpaethTech\WSL\Exceptions\ReleaseNotSupportedException;
-use SpaethTech\WSL\Exceptions\UnexpectedOutputException;
-use SpaethTech\WSL\Exceptions\VersionNotSupportedException;
 
 require_once __DIR__."/vendor/autoload.php";
 
 final class RoboFile extends Tasks
 {
-    use MonoRepo\Tasks;
+    //use MonoRepo\Tasks;
 
     private const GIT_PROVIDER      = "https://github.com";
     private const ORGANIZATION      = "spaethtech";
@@ -38,51 +33,105 @@ final class RoboFile extends Tasks
      *
      * Clones an existing repository into the monorepo, as a library
      *
-     * @param string    $name       The name of the library
+     * @param string $name The name of the library
      *
      * @option string   $dir        The base directory for libraries, relative to this RoboFile
      * @option string   $force      Forces replacement of an existing library
      * @option string   $owner      The owner of the library
      *
      * @noinspection PhpUnusedParameterInspection
+     * @throws TaskException
      */
-    public function libraryAdd(ConsoleIO $io, string $name, array $options = [
+    public function libAdd(ConsoleIO $io, string $name, array $options = [
         "dir|d" => self::MONOREPO_DIR,
-        "force|f" => FALSE,
-        "owner|o" => self::ORGANIZATION
-    ])
+        "org|o" => self::ORGANIZATION
+    ]): void
     {
-        $this->taskLibraryAdd($name)
-            ->dir($options["dir"])
-            ->owner($options["owner"])
-            ->force($options["force"])
+        $org = $io->input()->getOption("org");
+        $dir = $io->input()->getOption("dir");
+        $url = "https://github.com/$org/$name";
+
+        $path = "$dir/$name";
+
+        $result = $this->taskExecStack()
+            ->executable("git")
+            ->exec("reset")
+            ->exec("submodule add --name $org/$name $url $path")
+            ->exec("add .gitmodules")
+            ->exec("add lib")
+            ->exec("commit -m \"Added submodule $name to repository\"")
             ->run();
+
+        if ($result->wasSuccessful())
+            $this->taskVcs()->add($path, "Git")->run();
     }
+
 
     /**
      * @command lib:del
      *
      * Removes an existing library from the monorepo
      *
-     * @param string    $name       The name of the library
+     * @param string $name The name of the library
      *
      * @option string   $dir        The base directory for libraries, relative to this RoboFile
      * @option string   $force      Forces replacement of an existing library
      * @option string   $owner      The owner of the library
      *
      * @noinspection PhpUnusedParameterInspection
+     * @throws TaskException
      */
     public function libraryDel(ConsoleIO $io, string $name, array $options = [
         "dir|d" => self::MONOREPO_DIR,
-        "force|f" => FALSE,
-        "owner|o" => self::ORGANIZATION
+        "org|o" => self::ORGANIZATION
     ])
     {
-        $this->taskLibraryDel($name)
-            ->dir($options["dir"])
-            ->owner($options["owner"])
-            ->force($options["force"])
+//        $this->taskLibraryDel($name)
+//            ->dir($options["dir"])
+//            ->owner($options["owner"])
+//            ->force($options["force"])
+//            ->run();
+
+        $org = $io->input()->getOption("org");
+        $dir = $io->input()->getOption("dir");
+        $url = "https://github.com/$org/$name";
+
+        $path = "$dir/$name";
+
+        $this->taskExecStack()
+            ->executable("git")
+            ->exec("reset")
+            ->exec("submodule deinit -f $path")
             ->run();
+
+        $file = __DIR__."/.gitmodules";
+
+
+        $pattern = /** @lang RegExp */
+            "|^\[submodule \"(?<name>.*)\"]$".
+            "\s*path = (?<path>$path)$".
+            "\s*url = (?<url>.*)$\s*|m";
+
+        $this->taskExecStack()
+            ->executable("git")
+            ->exec("rm --cached $path")
+            ->run();
+
+        $contents = file_get_contents($file);
+        $contents = preg_replace($pattern, "", $contents);
+        file_put_contents($file, $contents);
+
+        $this->taskExecStack()
+            ->executable("git")
+            ->exec("add $path")
+            ->exec("add .gitmodules")
+            ->exec("commit -m \"Removed submodule $org/$name from repository\"")
+            ->run();
+
+        $this->taskDeleteDir([ ".git/modules/$path", $path ])
+            ->run();
+
+        $this->taskVcs()->del($path)->run();
     }
 
     /**
@@ -538,6 +587,91 @@ final class RoboFile extends Tasks
     #endregion
 
 
+    #region PhpStorm XML Commands
+
+    use App\Robo\Task\PhpStorm\loadTasks;
+
+
+
+    /**
+     * @param array<string> $paths
+     *
+     * @return void
+     *
+     * @noinspection PhpDocSignatureIsNotCompleteInspection
+     */
+    public function ideVcsAdd(ConsoleIO $io, array $paths, $options = [
+        "type|t" => "Git"
+    ]): void
+    {
+//        $vcs = match($options["type"])
+//        {
+//            "git", "Git" => VcsType::GIT,
+//            "svn", "subversion", "Subversion" => VcsType::SUBVERSION,
+//            "hg4", "mercurial", "Mercurial" => VcsType::MERCURIAL,
+//            "perforce", "Perforce" => VcsType::PERFORCE,
+//            default => die("Unsupported VCS type provided!")
+//        };
+        //$vcs = VcsType::nearest($options["type"]);
+
+        $type = $io->input()->getOption("type");
+
+        $task = $this->taskVcs();
+
+        foreach ($paths as $path)
+            $task->add($path, $type);
+
+        $task->run();
+
+    }
+
+    /**
+     * @param array<string> $paths
+     *
+     * @return void
+     *
+     * @noinspection PhpDocSignatureIsNotCompleteInspection
+     */
+    public function ideVcsDel(ConsoleIO $io, array $paths): void
+    {
+        $task = $this->taskVcs();
+
+        foreach ($paths as $path)
+            $task->del($path);
+
+        $task->run();
+
+    }
+
+
+    use \App\Robo\Task\Xml\loadTasks;
+
+    public function ideXmlTest(ConsoleIO $io)
+    {
+        $document = new DOMDocument();
+        $document->formatOutput = true;
+        $document->preserveWhiteSpace = false;
+        $document->load(".idea/vcs.xml");
+
+        $this->taskXmlQuery($document)
+            ->expression("//project")
+            ->each(
+                function(DOMElement $element, int $index): void
+                {
+                    print_r($element->getAttribute("version"));
+                }
+            )
+            ->run();
+
+
+    }
+
+
+
+
+
+    #endregion
 
 
 }
+

@@ -1,0 +1,31 @@
+#!/usr/bin/env php
+<?php
+declare(strict_types=1);
+
+print_r($argv[1]."\n");
+
+$usage = <<<EOF
+repo SUBCOMMAND
+
+subcommands:
+- add
+- del
+
+
+EOF;
+
+passthru("git reset");
+
+
+/**
+ * ADD
+ * ----------
+ * git reset
+ * git submodule add <URL> lib/<package>
+ * git add .gitmodules
+ * git add lib
+ * git commit -m "Added submodule <org>/<repo> to repository."
+ *
+ * Add git root to PhpStorm...
+ */
+
