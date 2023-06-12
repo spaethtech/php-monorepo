@@ -8,7 +8,8 @@ use Symfony\Component\Process\Process;
 
 class TaskCommand extends AbstractTask implements TaskInterface
 {
-    protected string $shell = "bash -c";
+    protected string $shell = "bash";
+    protected string $shellArgs = "-c";
 
     protected bool $hideOutput = false;
     protected bool $hideErrors = false;
@@ -26,12 +27,13 @@ class TaskCommand extends AbstractTask implements TaskInterface
 
     protected function buildCommand(): string
     {
-        return "$this->shell \"$this->command\"";
+        return "$this->shell $this->shellArgs \"$this->command\"";
     }
 
-    public function setShell(string $shell): self
+    public function setShell(string $shell, string $args): self
     {
         $this->shell = $shell;
+        $this->shellArgs = $args;
         return $this;
     }
 
@@ -54,6 +56,10 @@ class TaskCommand extends AbstractTask implements TaskInterface
         return $this->process;
     }
 
+    protected function printTaskMessage(string $message = "", string $format = "bg=cyan"): void
+    {
+        $this->io->writeln("<$format>[ {$this->getTaskName()} ($this->shell) ]</> $message");
+    }
 
     public function run(): TaskResult|false
     {
@@ -65,7 +71,8 @@ class TaskCommand extends AbstractTask implements TaskInterface
             $this->env
         );
 
-        $this->io->writeln("<bg=blue>$cmd</>");
+        $this->io->writeln("");
+        $this->printTaskMessage("$this->command");
 
         $this->process->run(
             function($type, $buffer)

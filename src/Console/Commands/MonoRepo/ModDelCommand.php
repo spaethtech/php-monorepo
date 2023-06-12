@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Console\Commands\MonoRepo;
 
 use App\Tasks\FileSystem\FileRegExRemoveTask;
+use App\Tasks\Git\GitModulesRemoveTask;
 use App\Tasks\TaskCommand;
 use App\Tasks\TaskResult;
 use App\Tasks\TaskBuilder;
@@ -15,7 +16,6 @@ use Symfony\Component\Console\Output\OutputInterface as Output;
 #[AsCommand("mod:del", "Removes a module from this repo")]
 class ModDelCommand extends ModuleCommand
 {
-
     protected function execute(Input $input, Output $output): int
     {
         $lib = $this->path;
@@ -24,27 +24,24 @@ class ModDelCommand extends ModuleCommand
 
         $result = (new TaskBuilder())
             ->stopOnFailure(false)
-            ->add(new TaskCommand("git reset"))
             ->hideErrors()
+            ->add(new TaskCommand("git reset"))
             ->addCommand("git submodule deinit -f $lib")
             ->addCommand("git rm --cached")
             ->addCommand("rm -rf .git/modules/$mod")
             ->addCommand("rm -rf $lib")
-            ->add(new FileRegExRemoveTask(PROJECT_DIR."/.gitmodules",
-                /** @lang RegExp */
-                "|^\[submodule \"(?<name>$mod)\"]$".
-                "\s*path = (?<path>$lib)$".
-                "\s*url = (?<url>$url)$\s*|m")
-            )
+            ->add(new GitModulesRemoveTask($mod, $lib, $url))
             ->addCommand("git add .gitmodules")
-            ->add($tracked = new TaskCommand("git ls-files --error-unmatch $lib", true))
+            ->add($tracked = new TaskCommand(
+                "git ls-files --error-unmatch $lib", true))
             ->addClosure(function() use ($tracked, $lib)
             {
                 return $tracked->getProcess()->getExitCode() === 0
                     ? (new TaskCommand("git add $lib"))->run()
                     : false;
             })
-            ->add($staged = new TaskCommand("git diff --cached --quiet --exit-code", true))
+            ->add($staged = new TaskCommand(
+                "git diff --cached --quiet --exit-code", true))
             ->addClosure(function() use ($staged, $mod)
             {
                 return $staged->getProcess()->getExitCode() === 1

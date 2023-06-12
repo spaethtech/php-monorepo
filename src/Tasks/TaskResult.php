@@ -8,6 +8,9 @@ use Symfony\Component\Process\Process;
 enum TaskResult
 {
     case SUCCESS;
+
+    case WARNING;
+
     case FAILURE;
 
 }

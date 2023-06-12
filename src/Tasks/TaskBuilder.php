@@ -15,7 +15,8 @@ class TaskBuilder
      */
     protected array $tasks = [];
 
-    protected string $shell = "bash -c";
+    protected string $shell = "bash";
+    protected string $shellArgs = "-c";
 
     protected bool $stopOnFailure = true;
 
@@ -30,9 +31,10 @@ class TaskBuilder
 //        $this->io = new SymfonyStyle($input, $output);
 //    }
 
-    public function setShell(string $shell): self
+    public function setShell(string $shell, string $args): self
     {
         $this->shell = $shell;
+        $this->shellArgs = $args;
         return $this;
     }
 
@@ -74,7 +76,7 @@ class TaskBuilder
     public function addCommand(string $command): self
     {
         $task = new TaskCommand($command);//, $this->io);
-        $task->setShell($this->shell);
+        $task->setShell($this->shell, $this->shellArgs);
         $task->hideOutput($this->hideOutput);
         $task->hideErrors($this->hideErrors);
 
