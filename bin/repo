@@ -2,30 +2,21 @@
 <?php
 declare(strict_types=1);
 
-print_r($argv[1]."\n");
+require __DIR__."/../vendor/autoload.php";
 
-$usage = <<<EOF
-repo SUBCOMMAND
+use App\Console\Commands\MonoRepo\ModAddCommand;
+use App\Console\Commands\MonoRepo\ModDelCommand;
+use Symfony\Component\Console\Application;
 
-subcommands:
-- add
-- del
+// Create the application
+$app = new Application("MonoRepo", "1.0.0");
 
+// Add any desired commands
+$app->addCommands([
+    new ModAddCommand(),
+    new ModDelCommand(),
+]);
 
-EOF;
-
-passthru("git reset");
-
-
-/**
- * ADD
- * ----------
- * git reset
- * git submodule add <URL> lib/<package>
- * git add .gitmodules
- * git add lib
- * git commit -m "Added submodule <org>/<repo> to repository."
- *
- * Add git root to PhpStorm...
- */
-
+// Run the application
+/** @noinspection PhpUnhandledExceptionInspection */
+$app->run();
