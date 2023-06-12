@@ -53,7 +53,7 @@ class ModDelCommand extends ModuleCommand
             })
             ->run();
 
-        return TaskResult::SUCCESS ? Command::SUCCESS : Command::FAILURE;
+        return $result === TaskResult::SUCCESS ? Command::SUCCESS : Command::FAILURE;
     }
 
 
