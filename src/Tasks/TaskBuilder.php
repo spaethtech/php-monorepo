@@ -11,9 +11,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class TaskBuilder
 {
     /**
-     * @var TaskInterface[]
+     * @var TaskBuilderEntry[]
      */
     protected array $tasks = [];
+
+
 
     protected string $shell = "bash";
     protected string $shellArgs = "-c";
@@ -67,20 +69,20 @@ class TaskBuilder
         return $this;
     }
 
-    public function add(TaskInterface $task): self
+    public function add(TaskInterface $task, Closure $conditional = null): self
     {
-        $this->tasks[] = $task;
+        $this->tasks[] = new TaskBuilderEntry($task, $conditional);
         return $this;
     }
 
-    public function addCommand(string $command): self
+    public function addCommand(string $command, Closure $conditional = null): self
     {
         $task = new TaskCommand($command);//, $this->io);
         $task->setShell($this->shell, $this->shellArgs);
         $task->hideOutput($this->hideOutput);
         $task->hideErrors($this->hideErrors);
 
-        return $this->add($task);
+        return $this->add($task, $conditional);
     }
 
     public function addClosure(Closure $closure): self
@@ -91,36 +93,35 @@ class TaskBuilder
 
 
 
-    public function execute(): array
-    {
-        $results = [];
-
-        foreach($this->tasks as $command)
-        {
-            $results[] = $result = $command->run();
-
-            if($result !== TaskResult::SUCCESS && $this->stopOnFailure)
-                break;
-        }
-
-        return $results;
-    }
-
     public function run(): TaskResult|false
     {
         $successful = TaskResult::SUCCESS;
 
-        foreach($this->tasks as $command)
+        for ($i = 0; $i < count($this->tasks); $i++)
         {
-            $result = $command->run();
+            $current = $this->tasks[$i];
+            $previous = ($i > 0) ? $this->tasks[$i - 1] : null;
+
+            if ($current->conditional instanceof Closure && !(($current->conditional)($current, $previous)))
+                continue; //Skip
+
+            $result = $current->task->run();
 
             if ($result === TaskResult::SUCCESS)
                 continue;
 
             if ($this->stopOnFailure)
+            {
+                if ($current->task instanceof TaskCommand)
+                {
+                    $exitCode = $current->task->getProcess()->getExitCode();
+                    return $current->task->printTaskFailure("Command failed with exit code: $exitCode");
+                }
+
                 return TaskResult::FAILURE;
-            else
-                $successful = TaskResult::FAILURE;
+            }
+
+            $successful = TaskResult::FAILURE;
         }
 
         return $successful;

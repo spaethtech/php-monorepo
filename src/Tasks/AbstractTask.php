@@ -39,30 +39,30 @@ abstract class AbstractTask
 
     }
 
-    protected function getTaskName(): string
+    public function getTaskName(): string
     {
         return basename(get_called_class());
     }
 
 
-    protected function printTaskMessage(string $message = "", string $format = "bg=cyan"): void
+    public function printTaskMessage(string $message = "", string $format = "bg=cyan"): void
     {
         $this->io->writeln("<$format>[ {$this->getTaskName()} ]</> $message");
     }
 
-    protected function printTaskSuccess(string $message = ""): TaskResult
+    public function printTaskSuccess(string $message = ""): TaskResult
     {
         $this->printTaskMessage($message, "bg=green");
         return TaskResult::SUCCESS;
     }
 
-    protected function printTaskWarning(string $message = ""): TaskResult
+    public function printTaskWarning(string $message = ""): TaskResult
     {
         $this->printTaskMessage($message, "bg=yellow");
         return TaskResult::WARNING;
     }
 
-    protected function printTaskFailure(string $message = ""): TaskResult
+    public function printTaskFailure(string $message = ""): TaskResult
     {
         $this->printTaskMessage($message, "bg=red");
         return TaskResult::FAILURE;

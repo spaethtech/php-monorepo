@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Tasks;
 
+use Closure;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Process;
 
@@ -14,7 +15,12 @@ class TaskCommand extends AbstractTask implements TaskInterface
     protected bool $hideOutput = false;
     protected bool $hideErrors = false;
 
-    public function __construct(protected string $command, protected bool $hidden = false)
+    public function __construct(
+        protected string $command,
+        protected bool $hidden = false,
+        protected array $successfulExitCodes = [ 0 ]
+        //protected ?Closure $resultMapper = null
+    )
     {
         parent::__construct();
 
@@ -23,6 +29,13 @@ class TaskCommand extends AbstractTask implements TaskInterface
             $this->hideOutput = true;
             $this->hideErrors = true;
         }
+
+//        $this->resultMapper ??= function(Process $p): TaskResult
+//        {
+//            return $p->getExitCode() === 0
+//                ? TaskResult::SUCCESS
+//                : TaskResult::FAILURE;
+//        };
     }
 
     protected function buildCommand(): string
@@ -56,7 +69,7 @@ class TaskCommand extends AbstractTask implements TaskInterface
         return $this->process;
     }
 
-    protected function printTaskMessage(string $message = "", string $format = "bg=cyan"): void
+    public function printTaskMessage(string $message = "", string $format = "bg=cyan"): void
     {
         $this->io->writeln("<$format>[ {$this->getTaskName()} ($this->shell) ]</> $message");
     }
@@ -93,9 +106,12 @@ class TaskCommand extends AbstractTask implements TaskInterface
             }
         );
 
-        //$this->exitCode = $process->getExitCode();
+        //$resultMapper = $this->resultMapper;
 
-        return $this->process->getExitCode() === 0
+
+        //return $this->process->getExitCode() === $this->successExitCode
+        return in_array($this->process->getExitCode(), $this->successfulExitCodes)
+        //return $resultMapper($this->process)
             ? TaskResult::SUCCESS
             : TaskResult::FAILURE;
     }
