@@ -32,6 +32,7 @@
         "spaethtech/php-slim-twig": "@dev",
         "spaethtech/php-support": "@dev",
         "spaethtech/php-synchronization": "@dev",
+        "spaethtech/php-templating": "@dev",
         "spaethtech/php-twig": "@dev",
 
         "composer/composer": "^2.5",
