@@ -25,3 +25,6 @@
 [submodule "spaethtech/php-rest"]
 	path = lib/php-rest
 	url = https://github.com/spaethtech/php-rest
+[submodule "spaethtech/php-sftp"]
+	path = lib/php-sftp
+	url = https://github.com/spaethtech/php-sftp
