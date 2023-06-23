@@ -31,3 +31,6 @@
 [submodule "spaethtech/php-data"]
 	path = lib/php-data
 	url = https://github.com/spaethtech/php-data
+[submodule "spaethtech/php-twig"]
+	path = lib/php-twig
+	url = https://github.com/spaethtech/php-twig
