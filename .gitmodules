@@ -16,3 +16,6 @@
 [submodule "spaethtech/php-slim"]
 	path = lib/php-slim
 	url = https://github.com/spaethtech/php-slim
+[submodule "spaethtech/php-slim-imagick"]
+	path = lib/php-slim-imagick
+	url = https://github.com/spaethtech/php-slim-imagick
