@@ -13,3 +13,6 @@
 [submodule "spaethtech/php-annotations"]
 	path = lib/php-annotations
 	url = https://github.com/spaethtech/php-annotations
+[submodule "spaethtech/php-slim"]
+	path = lib/php-slim
+	url = https://github.com/spaethtech/php-slim
