@@ -46,3 +46,6 @@
 [submodule "spaethtech/php-synchronization"]
 	path = lib/php-synchronization
 	url = https://github.com/spaethtech/php-synchronization
+[submodule "spaethtech/php-templating"]
+	path = lib/php-templating
+	url = https://github.com/spaethtech/php-templating
