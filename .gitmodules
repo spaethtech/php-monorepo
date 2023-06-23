@@ -43,3 +43,6 @@
 [submodule "spaethtech/php-localization"]
 	path = lib/php-localization
 	url = https://github.com/spaethtech/php-localization
+[submodule "spaethtech/php-synchronization"]
+	path = lib/php-synchronization
+	url = https://github.com/spaethtech/php-synchronization
