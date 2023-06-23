@@ -4,11 +4,8 @@ declare(strict_types=1);
 namespace App\Tasks\Git;
 
 use App\Tasks\Task;
-use App\Tasks\FileSystem\FileRegExReplaceTask;
 use App\Tasks\TaskInterface;
 use App\Tasks\TaskResult;
-use Closure;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 class GitModulesRemoveTask extends Task implements TaskInterface
 {
@@ -30,7 +27,7 @@ class GitModulesRemoveTask extends Task implements TaskInterface
         parent::__construct();
     }
 
-    public function run(/*TaskInterface $previous = null*/) : TaskResult|false
+    public function run() : TaskResult|false
     {
         $this->io->writeln("");
         $this->printTaskMessage("Removing $this->name from .gitmodules");

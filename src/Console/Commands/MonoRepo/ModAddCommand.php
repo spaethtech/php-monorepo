@@ -22,8 +22,7 @@ class ModAddCommand extends ModuleCommand
 {
     protected function execute(Input $input, Output $output): int
     {
-        $builder = new TaskBuilder();
-        $result = $builder
+        $result = (new TaskBuilder())
             // Ignore errors
             ->hideStdErr()
 
@@ -55,7 +54,7 @@ class ModAddCommand extends ModuleCommand
 
             // Check for staged changes and commit if needed
             ->add(new CommandTask("git diff --cached --quiet --exit-code", true, true, [1]))
-            ->add("git commit -m 'Added submodule $this->full to repository'",
+            ->add("git commit -m 'Added submodule $this->full to repository'", //CommandTask::previousExitCodeIs1(...)
                 function(TaskInterface $current, CommandTask $previous): bool
                 {
                     return $previous->getProcess()->getExitCode() === 1;

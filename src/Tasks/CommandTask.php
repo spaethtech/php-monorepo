@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Tasks;
 
+use Closure;
 use Symfony\Component\Process\Process;
 
 class CommandTask extends Task implements TaskInterface
@@ -25,6 +26,14 @@ class CommandTask extends Task implements TaskInterface
     {
         parent::__construct();
     }
+
+
+
+//    public static function previousExitCodeIs1(TaskInterface $current, CommandTask $previous): bool
+//    {
+//        return $previous->getProcess()->getExitCode() === 1;
+//    }
+
 
     protected function buildCommand(): string
     {
