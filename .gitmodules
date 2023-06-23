@@ -10,3 +10,6 @@
 [submodule "spaethtech/php-dynamics"]
 	path = lib/php-dynamics
 	url = https://github.com/spaethtech/php-dynamics
+[submodule "spaethtech/php-annotations"]
+	path = lib/php-annotations
+	url = https://github.com/spaethtech/php-annotations
