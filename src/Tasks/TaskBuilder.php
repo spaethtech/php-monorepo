@@ -4,35 +4,34 @@ declare(strict_types=1);
 namespace App\Tasks;
 
 use Closure;
-use Symfony\Component\Console\Input\InputInterface as Input;
-use Symfony\Component\Console\Output\OutputInterface as Output;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 class TaskBuilder
 {
-    /**
-     * @var TaskBuilderEntry[]
-     */
-    protected array $tasks = [];
-
-
+    /** @var TaskBuilderEntry[] */
+    protected array $entries = [];
 
     protected string $shell = "bash";
     protected string $shellArgs = "-c";
 
     protected bool $stopOnFailure = true;
 
-    protected bool $hideOutput = false;
+    protected bool $hideStdOut = false;
 
-    protected bool $hideErrors = false;
+    protected bool $hideStdErr = false;
 
-    //public SymfonyStyle $io;
+    #region Getters & Setters
 
-//    public function __construct(Input $input, Output $output)
-//    {
-//        $this->io = new SymfonyStyle($input, $output);
-//    }
-
+    /**
+     * Sets the shell to use when adding commands dynamically
+     *
+     * NOTES:
+     * - This only affects commands added using TaskBuilder::addCommand()
+     *
+     * @param string $shell The shell to use (i.e. "bash", "cmd.exe", etc.)
+     * @param string $args  Any shell arguments needed for execution (i.e. "-c", "/c", etc.)
+     *
+     * @return $this for method chaining
+     */
     public function setShell(string $shell, string $args): self
     {
         $this->shell = $shell;
@@ -40,28 +39,33 @@ class TaskBuilder
         return $this;
     }
 
-    public function hideOutput(): self
+    /**
+     * Sets the visibility of STDOUT to use when adding commands dynamically
+     *
+     * @param bool $hide When TRUE, will hide STDOUT
+     *
+     * @return $this for method chaining
+     */
+    public function hideStdOut(bool $hide = true): self
     {
-        $this->hideOutput = true;
+        $this->hideStdOut = $hide;
         return $this;
     }
 
-    public function showOutput(): self
+    /**
+     * Sets the visibility of STDERR to use when adding commands dynamically
+     *
+     * @param bool $hide When TRUE, will hide STDERR
+     *
+     * @return $this for method chaining
+     */
+    public function hideStdErr(bool $hide = true): self
     {
-        $this->hideOutput = false;
+        $this->hideStdErr = $hide;
         return $this;
     }
 
-    public function hideErrors(): self
-    {
-        $this->hideErrors = true;
-        return $this;
-    }
-    public function showErrors(): self
-    {
-        $this->hideErrors = false;
-        return $this;
-    }
+
 
     public function stopOnFailure(bool $stopOnFailure = true): self
     {
@@ -69,53 +73,54 @@ class TaskBuilder
         return $this;
     }
 
-    public function add(TaskInterface $task, Closure $conditional = null): self
+    #endregion
+
+    public function add(TaskInterface|Closure|string $task, Closure|bool $conditional = true): self
     {
-        $this->tasks[] = new TaskBuilderEntry($task, $conditional);
+        if (is_string($task))
+        {
+            $task = new CommandTask($task);
+            $task->setShell($this->shell, $this->shellArgs);
+            $task->hideStdOut($this->hideStdOut);
+            $task->hideStdErr($this->hideStdErr);
+        }
+
+        if(is_bool($conditional))
+            $conditional = fn(): bool => $conditional;
+
+        $this->entries[] = new TaskBuilderEntry($task, $conditional);
         return $this;
     }
-
-    public function addCommand(string $command, Closure $conditional = null): self
-    {
-        $task = new TaskCommand($command);//, $this->io);
-        $task->setShell($this->shell, $this->shellArgs);
-        $task->hideOutput($this->hideOutput);
-        $task->hideErrors($this->hideErrors);
-
-        return $this->add($task, $conditional);
-    }
-
-    public function addClosure(Closure $closure): self
-    {
-        $task = new TaskClosure($closure);
-        return $this->add($task);
-    }
-
-
 
     public function run(): TaskResult|false
     {
         $successful = TaskResult::SUCCESS;
 
-        for ($i = 0; $i < count($this->tasks); $i++)
+        for ($i = 0; $i < count($this->entries); $i++)
         {
-            $current = $this->tasks[$i];
-            $previous = ($i > 0) ? $this->tasks[$i - 1] : null;
+            $currCond = $this->entries[$i]->conditional;
+            $currTask = $this->entries[$i]->task;
+            $prevTask = ($i > 0) ? $this->entries[$i - 1]->task : null;
 
-            if ($current->conditional instanceof Closure && !(($current->conditional)($current, $previous)))
+            if ($currCond instanceof Closure && !($currCond($currTask, $prevTask)))
                 continue; //Skip
 
-            $result = $current->task->run();
+            $result = $currTask instanceof Closure
+                ? $currTask(new Task(), $prevTask)
+                : $currTask->run();
+
+            if(!$result instanceof TaskResult)
+                $result = false;
 
             if ($result === TaskResult::SUCCESS)
                 continue;
 
             if ($this->stopOnFailure)
             {
-                if ($current->task instanceof TaskCommand)
+                if ($currTask instanceof CommandTask)
                 {
-                    $exitCode = $current->task->getProcess()->getExitCode();
-                    return $current->task->printTaskFailure("Command failed with exit code: $exitCode");
+                    $exitCode = $currTask->getProcess()->getExitCode();
+                    return $currTask->printTaskFailure("Command failed with exit code: $exitCode");
                 }
 
                 return TaskResult::FAILURE;

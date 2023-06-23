@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace App\Tasks\Git;
 
-use App\Tasks\AbstractTask;
+use App\Tasks\Task;
 use App\Tasks\FileSystem\FileRegExReplaceTask;
 use App\Tasks\TaskInterface;
 use App\Tasks\TaskResult;
 use Closure;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class GitModulesRemoveTask extends AbstractTask implements TaskInterface
+class GitModulesRemoveTask extends Task implements TaskInterface
 {
     /**
      * @param string $name  The name of the submodule to match
@@ -30,7 +30,7 @@ class GitModulesRemoveTask extends AbstractTask implements TaskInterface
         parent::__construct();
     }
 
-    public function run() : TaskResult|false
+    public function run(/*TaskInterface $previous = null*/) : TaskResult|false
     {
         $this->io->writeln("");
         $this->printTaskMessage("Removing $this->name from .gitmodules");

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Robo\Task\PhpStorm;
+namespace App\Tasks\PhpStorm;
 
 enum ChangeType: string
 {

@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-abstract class AbstractTask
+class Task
 {
     protected SymfonyStyle $io;
 
@@ -30,7 +30,7 @@ abstract class AbstractTask
     }
 
 
-    protected function __construct(InputInterface $input = null, OutputInterface $output = null)
+    public function __construct(InputInterface $input = null, OutputInterface $output = null)
     {
         $this->io = new SymfonyStyle(
             $input ?? new ArgvInput(),
@@ -67,6 +67,7 @@ abstract class AbstractTask
         $this->printTaskMessage($message, "bg=red");
         return TaskResult::FAILURE;
     }
+
 
 
 

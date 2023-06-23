@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace App\Console\Commands\MonoRepo;
 
 use App\Tasks\Git\GitModulesRemoveTask;
+use App\Tasks\PhpStorm\Vcs\VcsTask;
 use App\Tasks\TaskBuilderEntry;
-use App\Tasks\TaskCommand;
+use App\Tasks\CommandTask;
+use App\Tasks\TaskInterface;
 use App\Tasks\TaskResult;
 use App\Tasks\TaskBuilder;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -13,56 +15,56 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface as Input;
 use Symfony\Component\Console\Output\OutputInterface as Output;
 
-#[AsCommand("mod:del", "Removes a module from this repo")]
+#[AsCommand(
+    name: "mod:del",
+    description: "Removes a module from this repo"
+)]
 class ModDelCommand extends ModuleCommand
 {
     protected function execute(Input $input, Output $output): int
     {
-        $lib = $this->path;
-        $mod = $this->full;
-        $url = $this->url;
-
         $result = (new TaskBuilder())
-            ->stopOnFailure(false) // Force all cleaning steps!
-            ->hideErrors()
-            ->addCommand("git reset")
-            ->addCommand("git submodule deinit -f $lib")
-            ->addCommand("git rm --cached")
-            ->addCommand("rm -rf .git/modules/$mod")
-            ->addCommand("rm -rf $lib")
+            // Force all cleaning steps!
+            ->stopOnFailure(false)
+
+            // Ignore errors
+            ->hideStdErr()
+
+            // Reset Git and remove submodule and associated files/folders
+            ->add("git reset")
+            ->add("git submodule deinit -f $this->path")
+            ->add("git rm --cached")
+            ->add("rm -rf .git/modules/$this->full")
+            ->add("rm -rf $this->path")
 
             // Remove the associated entry from the .gitmodules file and stage for commit
-            ->add(new GitModulesRemoveTask($mod, $lib, $url))
-            ->addCommand("git add .gitmodules")
+            ->add(new GitModulesRemoveTask($this->full, $this->path, $this->url))
+            ->add("git add .gitmodules")
 
-            // Check the submodule folder for changes
-            ->add(new TaskCommand("git ls-files --error-unmatch $lib", true))
-            // Stage the changes, if there are any
-            ->addCommand("git add $lib",
-                function(TaskBuilderEntry $current, TaskBuilderEntry $previous): bool
+            // Check the submodule folder for changes and stage if needed
+            ->add(new CommandTask("git ls-files --error-unmatch $this->path", true, true))
+            ->add("git add $this->path",
+                function(TaskInterface $current, CommandTask $previous): bool
                 {
-                    return $previous->task instanceof TaskCommand
-                        && $previous->task->getProcess()->getExitCode() === 0;
+                    return $previous->getProcess()->getExitCode() === 0;
                 }
             )
 
-            // Check for staged changes
-            ->add(new TaskCommand("git diff --cached --quiet --exit-code", true, [1]))
-            // Commit the staged changes
-            ->addCommand("git commit -m 'Removed submodule $mod'",
-                function(TaskBuilderEntry $current, TaskBuilderEntry $previous): bool
+            // Check for staged changes and commit if needed
+            ->add(new CommandTask("git diff --cached --quiet --exit-code", true, true, [1]))
+            ->add("git commit -m 'Removed submodule $this->full'",
+                function(TaskInterface $current, CommandTask $previous): bool
                 {
-                    return $previous->task instanceof TaskCommand
-                        && $previous->task->getProcess()->getExitCode() === 1;
-                        //&& $previous->task->getProcess()->isSuccessful();
+                    return $previous->getProcess()->getExitCode() === 1;
                 }
             )
+
+            // Remove related PhpStorm VCS configuration
+            ->add((new VcsTask())->del($this->path))
 
             ->run();
 
         return $result === TaskResult::SUCCESS ? Command::SUCCESS : Command::FAILURE;
     }
-
-
 
 }

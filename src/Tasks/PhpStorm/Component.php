@@ -1,13 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Robo\Task\PhpStorm;
+namespace App\Tasks\PhpStorm;
 
 enum Component
 {
     case VCS;
-
-
 
     public function file(): string
     {

@@ -1,17 +1,18 @@
 <?php /** @noinspection PhpUnused */
 declare(strict_types=1);
 
-namespace App\Robo\Task\PhpStorm\Vcs;
+namespace App\Tasks\PhpStorm\Vcs;
 
-use App\Robo\Task\PhpStorm\ChangeInfo;
-use App\Robo\Task\PhpStorm\ChangeType;
-use App\Robo\Task\PhpStorm\Component;
-use App\Robo\Task\PhpStorm\XmlBaseTask;
+use App\Tasks\PhpStorm\ChangeInfo;
+use App\Tasks\PhpStorm\ChangeType;
+use App\Tasks\PhpStorm\Component;
+use App\Tasks\PhpStorm\XmlTask;
+use App\Tasks\TaskInterface;
+use App\Tasks\TaskResult;
 use DOMException;
 use DOMNode;
-use Robo\Result;
 
-class Vcs extends XmlBaseTask
+class VcsTask extends XmlTask
 {
     /**
      * @var array<string, ChangeInfo>
@@ -75,13 +76,13 @@ class Vcs extends XmlBaseTask
             }
             else
             {
-                $this->printTaskInfo("* {$this->document->saveXML($mapping)}");
+                $this->printTaskMessage("* {$this->document->saveXML($mapping)}");
                 $this->getComponent()->replaceChild($mapping, $node);
                 return true;
             }
         }
 
-        $this->printTaskInfo("+ {$this->document->saveXML($mapping)}");
+        $this->printTaskMessage("+ {$this->document->saveXML($mapping)}");
         $this->getComponent()->appendChild($mapping);
         return true;
     }
@@ -97,14 +98,14 @@ class Vcs extends XmlBaseTask
         if ($node === null)
             return false;
 
-        $this->printTaskInfo("- {$this->document->saveXML($node)}");
+        $this->printTaskMessage("- {$this->document->saveXML($node)}");
         $node->parentNode->removeChild($node);
         return true;
     }
 
 
 
-    public function run(): Result
+    public function run(TaskInterface $previous = null): TaskResult|false
     {
         $this->load();
 
@@ -121,7 +122,7 @@ class Vcs extends XmlBaseTask
 
         $this->save();
 
-        return Result::success($this);
+        return TaskResult::SUCCESS;
     }
 }
 

@@ -1,31 +1,27 @@
 <?php /** @noinspection PhpUnused */
 declare(strict_types=1);
 
-namespace App\Robo\Task\PhpStorm;
+namespace App\Tasks\PhpStorm;
 
-use App\Robo\Task\PhpStorm\Exceptions\ComponentNotFoundException;
+use App\Tasks\Task;
+use App\Tasks\TaskInterface;
 use DOMDocument;
-use DOMElement;
 use DOMNode;
-use DOMNodeList;
 use DOMXPath;
-use Robo\Result;
-use Robo\Task\BaseTask;
 
-abstract class XmlBaseTask extends BaseTask
+abstract class XmlTask extends Task implements TaskInterface
 {
     protected const DIRECTORY_PREFIX = "\$PROJECT_DIR\$";
 
-    protected Component $component;
+    //protected Component $component;
     protected DOMDocument $document;
 
     protected DOMXPath $xpath;
 
-
-
-    public function __construct(Component $component)
+    public function __construct(protected Component $component)
     {
-        $this->component = $component;
+        parent::__construct();
+        //$this->component = $component;
     }
 
     protected function load(): void

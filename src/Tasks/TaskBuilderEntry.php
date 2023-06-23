@@ -8,8 +8,7 @@ use Closure;
 class TaskBuilderEntry
 {
     public function __construct(
-        public TaskInterface $task,
-        //public Closure|bool $conditional = true
+        public TaskInterface|Closure $task,
         public ?Closure $conditional = null
     )
     {

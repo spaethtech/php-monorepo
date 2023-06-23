@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Robo\Task\PhpStorm\Vcs;
+namespace App\Tasks\PhpStorm\Vcs;
 
 
 enum VcsType: string

@@ -6,6 +6,7 @@ require __DIR__."/../vendor/autoload.php";
 
 use App\Console\Commands\MonoRepo\ModAddCommand;
 use App\Console\Commands\MonoRepo\ModDelCommand;
+use App\Console\Commands\MonoRepo\ModDocCommand;
 use Symfony\Component\Console\Application;
 
 // Create the application
@@ -15,6 +16,7 @@ $app = new Application("MonoRepo", "1.0.0");
 $app->addCommands([
     new ModAddCommand(),
     new ModDelCommand(),
+    new ModDocCommand(),
 ]);
 
 // Run the application

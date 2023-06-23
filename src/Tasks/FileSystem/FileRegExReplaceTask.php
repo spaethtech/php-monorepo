@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace App\Tasks\FileSystem;
 
-use App\Tasks\AbstractTask;
+use App\Tasks\Task;
 use App\Tasks\TaskInterface;
 use App\Tasks\TaskResult;
 use Closure;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class FileRegExReplaceTask extends AbstractTask implements TaskInterface
+class FileRegExReplaceTask extends Task implements TaskInterface
 {
 
     public function __construct(

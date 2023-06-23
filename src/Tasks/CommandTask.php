@@ -3,39 +3,27 @@ declare(strict_types=1);
 
 namespace App\Tasks;
 
-use Closure;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Process;
 
-class TaskCommand extends AbstractTask implements TaskInterface
+class CommandTask extends Task implements TaskInterface
 {
     protected string $shell = "bash";
     protected string $shellArgs = "-c";
 
-    protected bool $hideOutput = false;
-    protected bool $hideErrors = false;
-
+    /**
+     * @param string $command
+     * @param bool $hideStdOut
+     * @param bool $hideStdErr
+     * @param int[] $successfulExitCodes
+     */
     public function __construct(
         protected string $command,
-        protected bool $hidden = false,
+        protected bool $hideStdOut = false,
+        protected bool $hideStdErr = false,
         protected array $successfulExitCodes = [ 0 ]
-        //protected ?Closure $resultMapper = null
     )
     {
         parent::__construct();
-
-        if ($this->hidden)
-        {
-            $this->hideOutput = true;
-            $this->hideErrors = true;
-        }
-
-//        $this->resultMapper ??= function(Process $p): TaskResult
-//        {
-//            return $p->getExitCode() === 0
-//                ? TaskResult::SUCCESS
-//                : TaskResult::FAILURE;
-//        };
     }
 
     protected function buildCommand(): string
@@ -50,15 +38,15 @@ class TaskCommand extends AbstractTask implements TaskInterface
         return $this;
     }
 
-    public function hideOutput(bool $hideOutput = true): self
+    public function hideStdOut(bool $hideStdOut = true): self
     {
-        $this->hideOutput = $hideOutput;
+        $this->hideStdOut = $hideStdOut;
         return $this;
     }
 
-    public function hideErrors(bool $hideErrors = true): self
+    public function hideStdErr(bool $hideStdErr = true): self
     {
-        $this->hideErrors = $hideErrors;
+        $this->hideStdErr = $hideStdErr;
         return $this;
     }
 
@@ -93,11 +81,11 @@ class TaskCommand extends AbstractTask implements TaskInterface
                 switch($type)
                 {
                     case Process::OUT:
-                        if(!$this->hideOutput)
+                        if(!$this->hideStdOut)
                             $this->io->write($buffer);
                         break;
                     case Process::ERR:
-                        if(!$this->hideErrors)
+                        if(!$this->hideStdErr)
                             $this->io->error($buffer);
                         break;
                     default:
@@ -106,12 +94,7 @@ class TaskCommand extends AbstractTask implements TaskInterface
             }
         );
 
-        //$resultMapper = $this->resultMapper;
-
-
-        //return $this->process->getExitCode() === $this->successExitCode
         return in_array($this->process->getExitCode(), $this->successfulExitCodes)
-        //return $resultMapper($this->process)
             ? TaskResult::SUCCESS
             : TaskResult::FAILURE;
     }
