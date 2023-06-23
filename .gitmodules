@@ -37,3 +37,6 @@
 [submodule "spaethtech/php-http"]
 	path = lib/php-http
 	url = https://github.com/spaethtech/php-http
+[submodule "spaethtech/php-slim-twig"]
+	path = lib/php-slim-twig
+	url = https://github.com/spaethtech/php-slim-twig
