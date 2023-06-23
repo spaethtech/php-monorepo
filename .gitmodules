@@ -22,3 +22,6 @@
 [submodule "spaethtech/php-html"]
 	path = lib/php-html
 	url = https://github.com/spaethtech/php-html
+[submodule "spaethtech/php-rest"]
+	path = lib/php-rest
+	url = https://github.com/spaethtech/php-rest
