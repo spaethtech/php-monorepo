@@ -28,3 +28,6 @@
 [submodule "spaethtech/php-sftp"]
 	path = lib/php-sftp
 	url = https://github.com/spaethtech/php-sftp
+[submodule "spaethtech/php-data"]
+	path = lib/php-data
+	url = https://github.com/spaethtech/php-data
