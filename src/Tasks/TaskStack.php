@@ -5,9 +5,20 @@ namespace App\Tasks;
 
 use Closure;
 
-class TaskBuilder
+/**
+ * A simple Task execution stack.
+ *
+ * NOTES:
+ * - Tasks are executed in the order they are added.
+ * - Tasks can include an optional Closure (or bool value) to allow for conditional execution.
+ * - Tasks can be added as a TaskInterface, Closure or a string which is converted to a CommandTask.
+ *
+ * @author Ryan Spaeth
+ * @copyright Spaeth Technologies Inc.
+ */
+class TaskStack implements TaskInterface
 {
-    /** @var TaskBuilderEntry[] */
+    /** @var TaskStackEntry[] */
     protected array $entries = [];
 
     protected string $shell = "bash";
@@ -88,7 +99,7 @@ class TaskBuilder
         if(is_bool($conditional))
             $conditional = fn(): bool => $conditional;
 
-        $this->entries[] = new TaskBuilderEntry($task, $conditional);
+        $this->entries[] = new TaskStackEntry($task, $conditional);
         return $this;
     }
 

@@ -5,7 +5,7 @@ namespace App\Console\Commands\MonoRepo;
 
 use App\Tasks\Task;
 use App\Tasks\PhpStorm\Vcs\VcsTask;
-use App\Tasks\TaskBuilder;
+use App\Tasks\TaskStack;
 use App\Tasks\CommandTask;
 use App\Tasks\TaskInterface;
 use App\Tasks\TaskResult;
@@ -22,7 +22,7 @@ class ModAddCommand extends ModuleCommand
 {
     protected function execute(Input $input, Output $output): int
     {
-        $result = (new TaskBuilder())
+        $result = (new TaskStack())
             // Ignore errors
             ->hideStdErr()
 

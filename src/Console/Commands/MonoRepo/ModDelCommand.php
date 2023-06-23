@@ -5,11 +5,11 @@ namespace App\Console\Commands\MonoRepo;
 
 use App\Tasks\Git\GitModulesRemoveTask;
 use App\Tasks\PhpStorm\Vcs\VcsTask;
-use App\Tasks\TaskBuilderEntry;
+use App\Tasks\TaskStackEntry;
 use App\Tasks\CommandTask;
 use App\Tasks\TaskInterface;
 use App\Tasks\TaskResult;
-use App\Tasks\TaskBuilder;
+use App\Tasks\TaskStack;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface as Input;
@@ -23,7 +23,7 @@ class ModDelCommand extends ModuleCommand
 {
     protected function execute(Input $input, Output $output): int
     {
-        $result = (new TaskBuilder())
+        $result = (new TaskStack())
             // Force all cleaning steps!
             ->stopOnFailure(false)
 

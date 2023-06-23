@@ -60,7 +60,7 @@ command_exists() {
 # you do would like to override the system-wide PHP interpreter in favor of a
 # pre-project one, set this to the appropriate directory.
 #path_prepend $(cygpath "C:\dev\lib\php\7.4.27-nts")
-path_prepend $(cygpath "C:\dev\lib\php\8.1.11-nts")
+path_prepend $(cygpath "C:\dev\lib\php\8.1.17-nts")
 
 # If you already have Composer in your PATH, this can be safely removed.  The
 # same information from above applies here.

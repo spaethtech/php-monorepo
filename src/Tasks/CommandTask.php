@@ -3,9 +3,14 @@ declare(strict_types=1);
 
 namespace App\Tasks;
 
-use Closure;
 use Symfony\Component\Process\Process;
 
+/**
+ * A command-based Task.
+ *
+ * @author Ryan Spaeth
+ * @copyright Spaeth Technologies Inc.
+ */
 class CommandTask extends Task implements TaskInterface
 {
     protected string $shell = "bash";

@@ -9,6 +9,16 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+/**
+ * The base Task class with no implemented run() logic.
+ *
+ * NOTES:
+ * - All other Tasks should extend from this class.
+ * - Our Closure-based Task uses this class directly!
+ *
+ * @author Ryan Spaeth
+ * @copyright Spaeth Technologies Inc.
+ */
 class Task
 {
     protected SymfonyStyle $io;

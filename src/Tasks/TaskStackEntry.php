@@ -5,7 +5,13 @@ namespace App\Tasks;
 
 use Closure;
 
-class TaskBuilderEntry
+/**
+ * An entry item for use in the TaskStack.
+ *
+ * @author Ryan Spaeth
+ * @copyright Spaeth Technologies Inc.
+ */
+class TaskStackEntry
 {
     public function __construct(
         public TaskInterface|Closure $task,

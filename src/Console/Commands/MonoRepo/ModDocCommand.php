@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace App\Console\Commands\MonoRepo;
 
 use App\Tasks\PhpStorm\Vcs\VcsTask;
-use App\Tasks\TaskBuilder;
-use App\Tasks\TaskBuilderEntry;
+use App\Tasks\TaskStack;
+use App\Tasks\TaskStackEntry;
 use App\Tasks\ClosureTask;
 use App\Tasks\CommandTask;
 use App\Tasks\TaskResult;
@@ -37,7 +37,7 @@ class ModDocCommand extends ModuleCommand
 
         $test = "";
 
-        $result = (new TaskBuilder())
+        $result = (new TaskStack())
             // Ignore errors
             ->hideStdErr()
 

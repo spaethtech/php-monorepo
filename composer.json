@@ -10,21 +10,36 @@
     ],
     "type": "monorepo",
     "require": {
-        "composer/composer": "^2.5",
+        "php": ">=8.1",
         "ext-curl": "*",
         "ext-json": "*",
-        "php": ">=8.1",
-        "spaethtech/annotations": "@dev",
-        "spaethtech/collections": "@dev",
         "ext-dom": "*",
         "ext-libxml": "*",
         "ext-simplexml": "*",
+
+        "spaethtech/php-annotations": "@dev",
+        "spaethtech/php-collections": "@dev",
+        "spaethtech/php-data": "@dev",
+        "spaethtech/php-dynamics": "@dev",
+        "spaethtech/php-html": "@dev",
+        "spaethtech/php-http": "@dev",
+        "spaethtech/php-localization": "@dev",
+        "spaethtech/php-phpdoc": "@dev",
+        "spaethtech/php-rest": "@dev",
+        "spaethtech/php-sftp": "@dev",
+        "spaethtech/php-slim": "@dev",
+        "spaethtech/php-slim-imagick": "@dev",
+        "spaethtech/php-slim-twig": "@dev",
+        "spaethtech/php-support": "@dev",
+        "spaethtech/php-synchronization": "@dev",
+        "spaethtech/php-twig": "@dev",
+
+        "composer/composer": "^2.5",
         "symfony/console": "^6.3",
         "symfony/process": "^6.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9",
-        "consolidation/robo": "^4"
+        "phpunit/phpunit": "^9"
     },
     "autoload": {
         "files": [
