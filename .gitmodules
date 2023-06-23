@@ -40,3 +40,6 @@
 [submodule "spaethtech/php-slim-twig"]
 	path = lib/php-slim-twig
 	url = https://github.com/spaethtech/php-slim-twig
+[submodule "spaethtech/php-localization"]
+	path = lib/php-localization
+	url = https://github.com/spaethtech/php-localization
