@@ -1,51 +1,51 @@
 [submodule "spaethtech/php-support"]
-	path = lib/php-support
-	url = https://github.com/spaethtech/php-support
+	path = lib/support
+	url = https://github.com/spaethtech/php/support
 [submodule "spaethtech/php-collections"]
-	path = lib/php-collections
-	url = https://github.com/spaethtech/php-collections
+	path = lib/collections
+	url = https://github.com/spaethtech/php/collections
 [submodule "spaethtech/php-phpdoc"]
-	path = lib/php-phpdoc
-	url = https://github.com/spaethtech/php-phpdoc
+	path = lib/phpdoc
+	url = https://github.com/spaethtech/php/phpdoc
 [submodule "spaethtech/php-dynamics"]
-	path = lib/php-dynamics
-	url = https://github.com/spaethtech/php-dynamics
+	path = lib/dynamics
+	url = https://github.com/spaethtech/php/dynamics
 [submodule "spaethtech/php-annotations"]
-	path = lib/php-annotations
-	url = https://github.com/spaethtech/php-annotations
+	path = lib/annotations
+	url = https://github.com/spaethtech/php/annotations
 [submodule "spaethtech/php-slim"]
-	path = lib/php-slim
-	url = https://github.com/spaethtech/php-slim
+	path = lib/slim
+	url = https://github.com/spaethtech/php/slim
 [submodule "spaethtech/php-slim-imagick"]
-	path = lib/php-slim-imagick
-	url = https://github.com/spaethtech/php-slim-imagick
+	path = lib/slim-imagick
+	url = https://github.com/spaethtech/php/slim-imagick
 [submodule "spaethtech/php-html"]
-	path = lib/php-html
-	url = https://github.com/spaethtech/php-html
+	path = lib/html
+	url = https://github.com/spaethtech/php/html
 [submodule "spaethtech/php-rest"]
-	path = lib/php-rest
-	url = https://github.com/spaethtech/php-rest
+	path = lib/rest
+	url = https://github.com/spaethtech/php/rest
 [submodule "spaethtech/php-sftp"]
-	path = lib/php-sftp
-	url = https://github.com/spaethtech/php-sftp
+	path = lib/sftp
+	url = https://github.com/spaethtech/php/sftp
 [submodule "spaethtech/php-data"]
-	path = lib/php-data
-	url = https://github.com/spaethtech/php-data
+	path = lib/data
+	url = https://github.com/spaethtech/php/data
 [submodule "spaethtech/php-twig"]
-	path = lib/php-twig
-	url = https://github.com/spaethtech/php-twig
+	path = lib/twig
+	url = https://github.com/spaethtech/php/twig
 [submodule "spaethtech/php-http"]
-	path = lib/php-http
-	url = https://github.com/spaethtech/php-http
+	path = lib/http
+	url = https://github.com/spaethtech/php/http
 [submodule "spaethtech/php-slim-twig"]
-	path = lib/php-slim-twig
-	url = https://github.com/spaethtech/php-slim-twig
+	path = lib/slim-twig
+	url = https://github.com/spaethtech/php/slim-twig
 [submodule "spaethtech/php-localization"]
-	path = lib/php-localization
-	url = https://github.com/spaethtech/php-localization
+	path = lib/localization
+	url = https://github.com/spaethtech/php/localization
 [submodule "spaethtech/php-synchronization"]
-	path = lib/php-synchronization
-	url = https://github.com/spaethtech/php-synchronization
+	path = lib/synchronization
+	url = https://github.com/spaethtech/php/synchronization
 [submodule "spaethtech/php-templating"]
-	path = lib/php-templating
-	url = https://github.com/spaethtech/php-templating
+	path = lib/templating
+	url = https://github.com/spaethtech/php/templating
